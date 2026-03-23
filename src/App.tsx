@@ -11,7 +11,7 @@ import {
   BookOpen,
 } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
-import { BrowserRouter, Routes, Route, Link, useNavigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Link } from "react-router-dom";
 import Leaderboard from "./Leaderboard";
 
 interface Donation {
@@ -22,14 +22,8 @@ interface Donation {
   date: Date;
 }
 
-// Composant Home (contient toutes les sections sauf le classement)
-const Home = ({
-  donations,
-  onDonate,
-}: {
-  donations: Donation[];
-  onDonate: (name: string, city: string, amount: number) => void;
-}) => {
+// Composant Home (ne reçoit plus donations)
+const Home = ({ onDonate }: { onDonate: (name: string, city: string, amount: number) => void }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [donationAmount, setDonationAmount] = useState("20");
   const [nomComplet, setNomComplet] = useState("");
@@ -452,10 +446,7 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route
-          path="/"
-          element={<Home donations={donations} onDonate={addDonation} />}
-        />
+        <Route path="/" element={<Home onDonate={addDonation} />} />
         <Route path="/classement" element={<Leaderboard donations={donations} />} />
       </Routes>
     </BrowserRouter>
