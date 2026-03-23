@@ -1,4 +1,6 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
+import { ArrowLeft } from "lucide-react";
 
 interface Donation {
   id: number;
@@ -13,28 +15,40 @@ interface LeaderboardProps {
 }
 
 const Leaderboard: React.FC<LeaderboardProps> = ({ donations }) => {
-  const [filter, setFilter] = useState<"week" | "month" | "all">("all");
+  const [filter, setFilter] = useState<"week" | "month" | "top" | "all">("all");
 
   const now = new Date();
   const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
   const monthAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
 
-  const filteredDonations = donations.filter((don) => {
-    if (filter === "week") return don.date >= weekAgo;
-    if (filter === "month") return don.date >= monthAgo;
-    return true;
-  });
+  let filteredDonations = [...donations];
+  if (filter === "week") {
+    filteredDonations = filteredDonations.filter((don) => don.date >= weekAgo);
+  } else if (filter === "month") {
+    filteredDonations = filteredDonations.filter((don) => don.date >= monthAgo);
+  } else if (filter === "top") {
+    filteredDonations = filteredDonations
+      .sort((a, b) => b.amount - a.amount)
+      .slice(0, 5);
+  }
 
   const sortedDonations = [...filteredDonations].sort((a, b) => b.amount - a.amount);
 
   return (
     <div className="container mx-auto px-6 py-20">
-      <h1 className="text-4xl font-bold text-center text-purple-700 mb-8">
-        Classement des dons
-      </h1>
+      <div className="flex justify-between items-center mb-8 flex-wrap gap-4">
+        <h1 className="text-4xl font-bold text-purple-700">Tableau d’Honneur</h1>
+        <Link
+          to="/"
+          className="inline-flex items-center gap-2 bg-purple-100 text-purple-700 px-5 py-2 rounded-full hover:bg-purple-200 transition"
+        >
+          <ArrowLeft size={20} />
+          Retour à l’accueil
+        </Link>
+      </div>
 
       {/* Filtres */}
-      <div className="flex justify-center gap-4 mb-8">
+      <div className="flex flex-wrap justify-center gap-4 mb-8">
         <button
           onClick={() => setFilter("week")}
           className={`px-6 py-2 rounded-full transition ${
@@ -54,6 +68,16 @@ const Leaderboard: React.FC<LeaderboardProps> = ({ donations }) => {
           }`}
         >
           Ce mois
+        </button>
+        <button
+          onClick={() => setFilter("top")}
+          className={`px-6 py-2 rounded-full transition ${
+            filter === "top"
+              ? "bg-purple-600 text-white"
+              : "bg-gray-200 text-gray-700 hover:bg-purple-100"
+          }`}
+        >
+          Meilleurs dons
         </button>
         <button
           onClick={() => setFilter("all")}

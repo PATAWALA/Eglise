@@ -98,10 +98,10 @@ const Home = ({ onDonate }: { onDonate: (name: string, city: string, amount: num
               Faire un don
             </a>
             <Link
-              to="/classement"
+              to="/tableau"
               className="text-gray-700 hover:text-purple-600 transition"
             >
-              Classement
+              Tableau d’Honneur
             </Link>
             <button
               onClick={scrollToDonate}
@@ -129,11 +129,11 @@ const Home = ({ onDonate }: { onDonate: (name: string, city: string, amount: num
               Faire un don
             </a>
             <Link
-              to="/classement"
+              to="/donneur"
               className="text-gray-700 hover:text-purple-600"
               onClick={() => setMobileMenuOpen(false)}
             >
-              Classement
+              Tableau d’Honneur
             </Link>
             <button
               onClick={scrollToDonate}
@@ -447,7 +447,7 @@ function App() {
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<Home onDonate={addDonation} />} />
-        <Route path="/classement" element={<Leaderboard donations={donations} />} />
+        <Route path="/tableau" element={<Leaderboard donations={donations} />} />
       </Routes>
     </BrowserRouter>
   );
