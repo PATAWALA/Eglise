@@ -10,50 +10,54 @@ import {
   X,
   BookOpen,
 } from "lucide-react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
+import { BrowserRouter, Routes, Route, Link, useNavigate } from "react-router-dom";
+import Leaderboard from "./Leaderboard";
 
-const App = () => {
+interface Donation {
+  id: number;
+  name: string;
+  city: string;
+  amount: number;
+  date: Date;
+}
+
+// Composant Home (contient toutes les sections sauf le classement)
+const Home = ({
+  donations,
+  onDonate,
+}: {
+  donations: Donation[];
+  onDonate: (name: string, city: string, amount: number) => void;
+}) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [donationAmount, setDonationAmount] = useState("20");
   const [nomComplet, setNomComplet] = useState("");
   const [villeQuartier, setVilleQuartier] = useState("");
 
-  // Carrousel d’images (fond)
-  const heroImages = [
-    "/images/eglise1.jpg",
-    "/images/eglise2.jpg",
-    "/images/eglise3.jpg",
-  ];
-
-  // États pour le crossfade
-  const [currentImage, setCurrentImage] = useState(0);
-  const [nextImage, setNextImage] = useState(1);
-  const [fade, setFade] = useState(true); // true = current visible, false = next visible
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setFade(false); // commencer le fondu vers la prochaine image
-      setTimeout(() => {
-        // Une fois la transition terminée, on échange les rôles
-        setCurrentImage(nextImage);
-        setNextImage((nextImage + 1) % heroImages.length);
-        setFade(true); // current image redevient visible
-      }, 1000); // doit correspondre à la durée de transition
-    }, 4000); // changement toutes les 4 secondes
-    return () => clearInterval(interval);
-  }, [nextImage, heroImages.length]);
+  const donateSectionRef = useRef<HTMLElement>(null);
 
   const handleDonate = () => {
     if (!nomComplet || !villeQuartier) {
       alert("Veuillez remplir tous les champs avant de donner.");
       return;
     }
+    const amountNumber = parseFloat(donationAmount);
+    if (isNaN(amountNumber) || amountNumber <= 0) {
+      alert("Veuillez entrer un montant valide.");
+      return;
+    }
+    onDonate(nomComplet, villeQuartier, amountNumber);
     alert(
-      `Merci ${nomComplet} de ${villeQuartier} pour votre don de ${donationAmount} € ! Que Dieu vous bénisse.`
+      `Merci ${nomComplet} de ${villeQuartier} pour votre don de ${amountNumber} € ! Que Dieu vous bénisse.`
     );
     setNomComplet("");
     setVilleQuartier("");
     setDonationAmount("20");
+  };
+
+  const scrollToDonate = () => {
+    donateSectionRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
   const fadeInUp = {
@@ -63,8 +67,25 @@ const App = () => {
     viewport: { once: true, amount: 0.3 },
   };
 
+  const heroImages = ["/images/eglise1.jpg", "/images/eglise2.jpg", "/images/eglise3.jpg"];
+  const [currentImage, setCurrentImage] = useState(0);
+  const [nextImage, setNextImage] = useState(1);
+  const [fade, setFade] = useState(true);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setFade(false);
+      setTimeout(() => {
+        setCurrentImage(nextImage);
+        setNextImage((nextImage + 1) % heroImages.length);
+        setFade(true);
+      }, 1000);
+    }, 4000);
+    return () => clearInterval(interval);
+  }, [nextImage, heroImages.length]);
+
   return (
-    <div className="font-sans">
+    <>
       {/* Navbar */}
       <nav className="fixed top-0 w-full bg-white/90 backdrop-blur-md shadow-sm z-50">
         <div className="container mx-auto px-6 py-4 flex justify-between items-center">
@@ -82,7 +103,16 @@ const App = () => {
             <a href="#donate" className="text-gray-700 hover:text-purple-600 transition">
               Faire un don
             </a>
-            <button className="bg-purple-600 text-white px-5 py-2 rounded-full hover:bg-purple-700 transition shadow-md">
+            <Link
+              to="/classement"
+              className="text-gray-700 hover:text-purple-600 transition"
+            >
+              Classement
+            </Link>
+            <button
+              onClick={scrollToDonate}
+              className="bg-purple-600 text-white px-5 py-2 rounded-full hover:bg-purple-700 transition shadow-md"
+            >
               Donner maintenant
             </button>
           </div>
@@ -104,14 +134,24 @@ const App = () => {
             <a href="#donate" className="text-gray-700 hover:text-purple-600" onClick={() => setMobileMenuOpen(false)}>
               Faire un don
             </a>
-            <button className="bg-purple-600 text-white px-5 py-2 rounded-full w-full text-center">
+            <Link
+              to="/classement"
+              className="text-gray-700 hover:text-purple-600"
+              onClick={() => setMobileMenuOpen(false)}
+            >
+              Classement
+            </Link>
+            <button
+              onClick={scrollToDonate}
+              className="bg-purple-600 text-white px-5 py-2 rounded-full w-full text-center"
+            >
               Donner maintenant
             </button>
           </div>
         )}
       </nav>
 
-      {/* Hero Section avec crossfade */}
+      {/* Hero Section */}
       <section id="hero" className="relative pt-32 pb-20 min-h-screen flex items-center overflow-hidden">
         <div className="absolute inset-0">
           <img
@@ -143,7 +183,10 @@ const App = () => {
               démunis.
             </p>
             <div className="mt-8 flex flex-wrap gap-4 justify-center md:justify-start">
-              <button className="bg-purple-600 text-white px-8 py-3 rounded-full hover:bg-purple-700 transition flex items-center gap-2 shadow-lg">
+              <button
+                onClick={scrollToDonate}
+                className="bg-purple-600 text-white px-8 py-3 rounded-full hover:bg-purple-700 transition flex items-center gap-2 shadow-lg"
+              >
                 Faire un don <ChevronRight size={18} />
               </button>
               <button className="border border-white text-white px-8 py-3 rounded-full hover:bg-white/10 transition">
@@ -152,13 +195,11 @@ const App = () => {
             </div>
           </motion.div>
         </div>
-        {/* Points indicateurs */}
         <div className="absolute bottom-6 left-1/2 transform -translate-x-1/2 flex gap-2 z-10">
           {heroImages.map((_, idx) => (
             <button
               key={idx}
               onClick={() => {
-                // Changement manuel : on force les images sans attendre l'intervalle
                 setCurrentImage(idx);
                 setNextImage((idx + 1) % heroImages.length);
                 setFade(true);
@@ -271,7 +312,7 @@ const App = () => {
       </section>
 
       {/* Donation form */}
-      <section id="donate" className="py-20 bg-gradient-to-br from-purple-50 to-indigo-100">
+      <section id="donate" ref={donateSectionRef} className="py-20 bg-gradient-to-br from-purple-50 to-indigo-100">
         <div className="container mx-auto px-6">
           <motion.div {...fadeInUp} className="text-center max-w-2xl mx-auto">
             <h2 className="text-3xl font-bold text-gray-800">Faites un don aujourd'hui</h2>
@@ -382,8 +423,43 @@ const App = () => {
           </div>
         </div>
       </footer>
-    </div>
+    </>
   );
 };
+
+// Composant principal avec routage
+function App() {
+  const [donations, setDonations] = useState<Donation[]>([
+    { id: 1, name: "Jean Dupont", city: "Paris", amount: 500, date: new Date(2026, 2, 15) },
+    { id: 2, name: "Marie Lambert", city: "Lyon", amount: 300, date: new Date(2026, 2, 10) },
+    { id: 3, name: "Pierre Martin", city: "Marseille", amount: 200, date: new Date(2026, 2, 5) },
+    { id: 4, name: "Sophie Bernard", city: "Bordeaux", amount: 1000, date: new Date(2026, 1, 28) },
+    { id: 5, name: "Lucas Moreau", city: "Lille", amount: 750, date: new Date(2026, 1, 20) },
+    { id: 6, name: "Élise Robert", city: "Toulouse", amount: 450, date: new Date(2026, 2, 18) },
+  ]);
+
+  const addDonation = (name: string, city: string, amount: number) => {
+    const newDonation: Donation = {
+      id: donations.length + 1,
+      name,
+      city,
+      amount,
+      date: new Date(),
+    };
+    setDonations([...donations, newDonation]);
+  };
+
+  return (
+    <BrowserRouter>
+      <Routes>
+        <Route
+          path="/"
+          element={<Home donations={donations} onDonate={addDonation} />}
+        />
+        <Route path="/classement" element={<Leaderboard donations={donations} />} />
+      </Routes>
+    </BrowserRouter>
+  );
+}
 
 export default App;
