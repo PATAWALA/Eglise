@@ -83,7 +83,7 @@ const Home = ({ onDonate }: { onDonate: (name: string, city: string, amount: num
       {/* Navbar */}
       <nav className="fixed top-0 w-full bg-white/90 backdrop-blur-md shadow-sm z-50">
         <div className="container mx-auto px-6 py-4 flex justify-between items-center">
-          <div className="text-2xl font-bold text-purple-700">Église de la Grâce</div>
+          <div className="text-2xl font-bold text-purple-700">Mon offrande </div>
           <div className="hidden md:flex space-x-8 items-center">
             <a href="#hero" className="text-gray-700 hover:text-purple-600 transition">
               Accueil
