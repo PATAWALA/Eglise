@@ -7,14 +7,17 @@ interface Donation {
   name: string;
   city: string;
   amount: number;
-  date: Date;
+  date: string;
+  donation_type: string;
+  payment_method: string;
 }
 
 interface LeaderboardProps {
   donations: Donation[];
+  loading?: boolean;
 }
 
-const Leaderboard: React.FC<LeaderboardProps> = ({ donations }) => {
+const Leaderboard: React.FC<LeaderboardProps> = ({ donations, loading = false }) => {
   const [filter, setFilter] = useState<"week" | "month" | "top" | "all">("all");
 
   const now = new Date();
@@ -23,9 +26,9 @@ const Leaderboard: React.FC<LeaderboardProps> = ({ donations }) => {
 
   let filteredDonations = [...donations];
   if (filter === "week") {
-    filteredDonations = filteredDonations.filter((don) => don.date >= weekAgo);
+    filteredDonations = filteredDonations.filter((don) => new Date(don.date) >= weekAgo);
   } else if (filter === "month") {
-    filteredDonations = filteredDonations.filter((don) => don.date >= monthAgo);
+    filteredDonations = filteredDonations.filter((don) => new Date(don.date) >= monthAgo);
   } else if (filter === "top") {
     filteredDonations = filteredDonations
       .sort((a, b) => b.amount - a.amount)
@@ -34,64 +37,39 @@ const Leaderboard: React.FC<LeaderboardProps> = ({ donations }) => {
 
   const sortedDonations = [...filteredDonations].sort((a, b) => b.amount - a.amount);
 
+  if (loading) {
+    return (
+      <div className="container mx-auto px-6 py-20 text-center">
+        <div className="text-purple-600 text-xl">Chargement du tableau d'honneur...</div>
+      </div>
+    );
+  }
+
   return (
     <div className="container mx-auto px-6 py-20">
       <div className="flex justify-between items-center mb-8 flex-wrap gap-4">
-        <h1 className="text-4xl font-bold text-purple-700">Tableau d’Honneur</h1>
-        <Link
-          to="/"
-          className="inline-flex items-center gap-2 bg-purple-100 text-purple-700 px-5 py-2 rounded-full hover:bg-purple-200 transition"
-        >
+        <h1 className="text-4xl font-bold text-purple-700">Tableau d'Honneur</h1>
+        <Link to="/" className="inline-flex items-center gap-2 bg-purple-100 text-purple-700 px-5 py-2 rounded-full hover:bg-purple-200 transition">
           <ArrowLeft size={20} />
-          Retour à l’accueil
+          Retour à l'accueil
         </Link>
       </div>
 
-      {/* Filtres */}
       <div className="flex flex-wrap justify-center gap-4 mb-8">
-        <button
-          onClick={() => setFilter("week")}
-          className={`px-6 py-2 rounded-full transition ${
-            filter === "week"
-              ? "bg-purple-600 text-white"
-              : "bg-gray-200 text-gray-700 hover:bg-purple-100"
-          }`}
-        >
+        <button onClick={() => setFilter("week")} className={`px-6 py-2 rounded-full transition ${filter === "week" ? "bg-purple-600 text-white" : "bg-gray-200 text-gray-700 hover:bg-purple-100"}`}>
           Cette semaine
         </button>
-        <button
-          onClick={() => setFilter("month")}
-          className={`px-6 py-2 rounded-full transition ${
-            filter === "month"
-              ? "bg-purple-600 text-white"
-              : "bg-gray-200 text-gray-700 hover:bg-purple-100"
-          }`}
-        >
+        <button onClick={() => setFilter("month")} className={`px-6 py-2 rounded-full transition ${filter === "month" ? "bg-purple-600 text-white" : "bg-gray-200 text-gray-700 hover:bg-purple-100"}`}>
           Ce mois
         </button>
-        <button
-          onClick={() => setFilter("top")}
-          className={`px-6 py-2 rounded-full transition ${
-            filter === "top"
-              ? "bg-purple-600 text-white"
-              : "bg-gray-200 text-gray-700 hover:bg-purple-100"
-          }`}
-        >
+        <button onClick={() => setFilter("top")} className={`px-6 py-2 rounded-full transition ${filter === "top" ? "bg-purple-600 text-white" : "bg-gray-200 text-gray-700 hover:bg-purple-100"}`}>
           Meilleurs dons
         </button>
-        <button
-          onClick={() => setFilter("all")}
-          className={`px-6 py-2 rounded-full transition ${
-            filter === "all"
-              ? "bg-purple-600 text-white"
-              : "bg-gray-200 text-gray-700 hover:bg-purple-100"
-          }`}
-        >
+        <button onClick={() => setFilter("all")} className={`px-6 py-2 rounded-full transition ${filter === "all" ? "bg-purple-600 text-white" : "bg-gray-200 text-gray-700 hover:bg-purple-100"}`}>
           Tous les dons
         </button>
       </div>
 
-      {/* Tableau */}
       <div className="overflow-x-auto">
         <table className="min-w-full bg-white rounded-xl shadow-md overflow-hidden">
           <thead className="bg-purple-600 text-white">
@@ -116,12 +94,8 @@ const Leaderboard: React.FC<LeaderboardProps> = ({ donations }) => {
                   <td className="py-3 px-6 font-semibold">{idx + 1}</td>
                   <td className="py-3 px-6">{don.name}</td>
                   <td className="py-3 px-6">{don.city}</td>
-                  <td className="py-3 px-6 text-right font-bold text-purple-600">
-                    {don.amount} €
-                  </td>
-                  <td className="py-3 px-6 text-gray-600">
-                    {don.date.toLocaleDateString()}
-                  </td>
+                  <td className="py-3 px-6 text-right font-bold text-purple-600">{don.amount} €</td>
+                  <td className="py-3 px-6 text-gray-600">{new Date(don.date).toLocaleDateString()}</td>
                 </tr>
               ))
             )}
