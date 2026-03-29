@@ -59,62 +59,99 @@ const AdminPartners = () => {
   const approveRequest = async (request: PartnershipRequest) => {
     const { data: { user } } = await supabase.auth.getUser();
     
-    // 1. Mettre à jour le statut dans partnership_requests
-    await supabase
-      .from('partnership_requests')
-      .update({ status: 'approved' })
-      .eq('id', request.id);
-
-    // 2. Mettre à jour le partenaire dans partners
-    const { data: existingPartner } = await supabase
-      .from('partners')
-      .select('id')
-      .eq('email', request.email)
-      .single();
-
-    if (existingPartner) {
+    try {
+      // 1. Mettre à jour le statut dans partnership_requests
       await supabase
-        .from('partners')
-        .update({ 
-          status: 'approved',
-          reviewed_by: user?.id,
-          reviewed_at: new Date()
-        })
-        .eq('id', existingPartner.id);
-    }
+        .from('partnership_requests')
+        .update({ status: 'approved' })
+        .eq('id', request.id);
 
-    // 3. Recharger les données
-    await loadData();
-    alert(`✅ Partenaire ${request.name} approuvé avec succès !`);
+      // 2. Vérifier si le partenaire existe déjà dans partners
+      const { data: existingPartner } = await supabase
+        .from('partners')
+        .select('*')
+        .eq('email', request.email)
+        .maybeSingle(); // Utiliser maybeSingle au lieu de single pour éviter l'erreur
+
+      if (existingPartner) {
+        // Mettre à jour le partenaire existant (changer son statut)
+        const { error: updateError } = await supabase
+          .from('partners')
+          .update({ 
+            status: 'approved',
+            name: request.name,
+            phone: request.phone,
+            age: request.age,
+            reviewed_by: user?.id,
+            reviewed_at: new Date().toISOString()
+          })
+          .eq('id', existingPartner.id);
+
+        if (updateError) throw updateError;
+      } else {
+        // Créer un nouveau partenaire
+        const { error: insertError } = await supabase
+          .from('partners')
+          .insert({
+            id: crypto.randomUUID(),
+            email: request.email,
+            name: request.name,
+            phone: request.phone,
+            age: request.age,
+            status: 'approved',
+            reviewed_by: user?.id,
+            reviewed_at: new Date().toISOString(),
+            created_at: new Date().toISOString()
+          });
+
+        if (insertError) throw insertError;
+      }
+
+      // 3. Recharger les données
+      await loadData();
+      alert(`✅ Partenaire ${request.name} approuvé avec succès !`);
+    } catch (error) {
+      console.error('Erreur lors de l\'approbation:', error);
+      alert('Erreur lors de l\'approbation. Veuillez réessayer.');
+    }
   };
 
   const rejectRequest = async (request: PartnershipRequest) => {
     if (!confirm(`Êtes-vous sûr de vouloir rejeter la demande de ${request.name} ?`)) return;
 
-    await supabase
-      .from('partnership_requests')
-      .update({ status: 'rejected' })
-      .eq('id', request.id);
+    try {
+      await supabase
+        .from('partnership_requests')
+        .update({ status: 'rejected' })
+        .eq('id', request.id);
 
-    await supabase
-      .from('partners')
-      .update({ status: 'rejected' })
-      .eq('email', request.email);
+      // Mettre à jour le statut dans partners si existe
+      await supabase
+        .from('partners')
+        .update({ status: 'rejected' })
+        .eq('email', request.email);
 
-    await loadData();
-    alert(`❌ Demande de ${request.name} rejetée.`);
+      await loadData();
+      alert(`❌ Demande de ${request.name} rejetée.`);
+    } catch (error) {
+      alert('Erreur lors du rejet');
+    }
   };
 
   const removePartner = async (partner: Partner) => {
     if (!confirm(`⚠️ Attention ! Êtes-vous sûr de vouloir supprimer ${partner.name} de la liste des partenaires ?`)) return;
 
-    await supabase
-      .from('partners')
-      .update({ status: 'rejected' })
-      .eq('id', partner.id);
+    try {
+      await supabase
+        .from('partners')
+        .update({ status: 'rejected' })
+        .eq('id', partner.id);
 
-    await loadData();
-    alert(`🗑️ ${partner.name} a été retiré des partenaires.`);
+      await loadData();
+      alert(`🗑️ ${partner.name} a été retiré des partenaires.`);
+    } catch (error) {
+      alert('Erreur lors de la suppression');
+    }
   };
 
   if (loading) {
