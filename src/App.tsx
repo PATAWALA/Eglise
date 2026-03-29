@@ -17,6 +17,7 @@ import {
   Smartphone,
 } from "lucide-react";
 import DevenirPartenaire from './DevenirPartenaire';
+import PartnerDashboard from './PartnerDashboard';
 import { useState, useEffect, useRef } from "react";
 import { BrowserRouter, Routes, Route, Link, Navigate } from "react-router-dom";
 import { supabase } from "./lib/supabase";
@@ -467,6 +468,7 @@ function App() {
       <Routes>
         <Route path="/" element={<LandingPage onDonate={addDonation} />} />
         <Route path="/devenir-partenaire" element={<DevenirPartenaire />} />
+        <Route path="/espace-partenaire" element={<PartnerDashboard />} />
         <Route path="/tableau" element={<Leaderboard donations={donations} loading={loading} />} />
         <Route path="/admin-login" element={<AdminLogin />} />
         <Route path="/admin" element={<ProtectedAdminRoute />} />
