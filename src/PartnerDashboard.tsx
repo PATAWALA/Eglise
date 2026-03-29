@@ -3,16 +3,11 @@ import { useNavigate } from 'react-router-dom';
 import { 
   ArrowLeft, 
   LogOut, 
-  User, 
   Heart, 
   Calendar, 
   TrendingUp,
   Download,
-  Clock,
-  CheckCircle,
-  Gift,
-  BarChart3,
-  Eye
+  Gift
 } from 'lucide-react';
 import { supabase } from './lib/supabase';
 import { format, subDays, subMonths } from 'date-fns';
@@ -261,7 +256,7 @@ const PartnerDashboard = () => {
               <div>
                 <p className="text-gray-500 text-sm">Membre depuis</p>
                 <p className="text-3xl font-bold text-purple-700">
-                  {format(new Date(partner.created_at), 'MM/yyyy')}
+                  {partner.created_at ? format(new Date(partner.created_at), 'MM/yyyy') : 'N/A'}
                 </p>
               </div>
               <Calendar size={40} className="text-purple-200" />

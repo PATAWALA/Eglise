@@ -416,19 +416,19 @@ const AdminDashboard = () => {
             <ResponsiveContainer width="100%" height={300}>
               <PieChart>
                 <Pie
-                  data={getDonationTypesData()}
-                  cx="50%"
-                  cy="50%"
-                  labelLine={false}
-                  label={({ name, percent }) => `${name} (${(percent * 100).toFixed(0)}%)`}
-                  outerRadius={100}
-                  fill="#8884d8"
-                  dataKey="value"
-                >
-                  {getDonationTypesData().map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                  ))}
-                </Pie>
+  data={getDonationTypesData()}
+  cx="50%"
+  cy="50%"
+  labelLine={false}
+  label={({ name, percent }) => percent ? `${name} (${(percent * 100).toFixed(0)}%)` : name}
+  outerRadius={100}
+  fill="#8884d8"
+  dataKey="value"
+>
+  {getDonationTypesData().map((_entry, index) => (
+    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+  ))}
+</Pie>
                 <Tooltip formatter={(value) => `${value} €`} />
               </PieChart>
             </ResponsiveContainer>
