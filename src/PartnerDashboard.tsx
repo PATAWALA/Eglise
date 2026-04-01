@@ -937,23 +937,27 @@ const PartnerDashboard = () => {
                 <div className="bg-white rounded-2xl shadow-sm p-6">
                   <h2 className="text-lg font-semibold text-gray-800 mb-6">Répartition par type de don</h2>
                   <ResponsiveContainer width="100%" height={300}>
-                    <RePieChart>
-                      <Pie
-                        data={typeData}
-                        cx="50%"
-                        cy="50%"
-                        labelLine={false}
-                        label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
-                        outerRadius={80}
-                        fill="#8884d8"
-                        dataKey="value"
-                      >
-                        {typeData.map((entry, index) => (
-                          <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                        ))}
-                      </Pie>
-                      <Tooltip />
-                    </RePieChart>
+
+<RePieChart>
+  <Pie
+    data={typeData}
+    cx="50%"
+    cy="50%"
+    labelLine={false}
+    label={({ name, percent }) => {
+      const pct = percent !== undefined ? percent : 0;
+      return `${name} ${(pct * 100).toFixed(0)}%`;
+    }}
+    outerRadius={80}
+    fill="#8884d8"
+    dataKey="value"
+  >
+    {typeData.map((entry, index) => (
+      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+    ))}
+  </Pie>
+  <Tooltip />
+</RePieChart>
                   </ResponsiveContainer>
                 </div>
                 
