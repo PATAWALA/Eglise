@@ -1,6 +1,19 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Link } from "react-router-dom";
-import { ArrowLeft } from "lucide-react";
+import { 
+  ArrowLeft, 
+  Crown, 
+  Heart, 
+  Calendar, 
+  Medal, 
+  Trophy,
+  Star,
+  HandHeart,
+  CalendarDays,
+  Award,
+  List
+} from "lucide-react";
+import { motion } from "framer-motion";
 
 interface Donation {
   id: number;
@@ -20,87 +33,216 @@ interface LeaderboardProps {
 const Leaderboard: React.FC<LeaderboardProps> = ({ donations, loading = false }) => {
   const [filter, setFilter] = useState<"week" | "month" | "top" | "all">("all");
 
+  // Calcul des dates
   const now = new Date();
   const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
   const monthAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
 
-  let filteredDonations = [...donations];
-  if (filter === "week") {
-    filteredDonations = filteredDonations.filter((don) => new Date(don.date) >= weekAgo);
-  } else if (filter === "month") {
-    filteredDonations = filteredDonations.filter((don) => new Date(don.date) >= monthAgo);
-  } else if (filter === "top") {
-    filteredDonations = filteredDonations
-      .sort((a, b) => b.amount - a.amount)
-      .slice(0, 5);
-  }
+  // Filtrer et trier les dons
+  const filteredDonations = useMemo(() => {
+    let filtered = [...donations];
+    
+    if (filter === "week") {
+      filtered = filtered.filter((don) => new Date(don.date) >= weekAgo);
+    } else if (filter === "month") {
+      filtered = filtered.filter((don) => new Date(don.date) >= monthAgo);
+    } else if (filter === "top") {
+      filtered = filtered
+        .sort((a, b) => b.amount - a.amount)
+        .slice(0, 10);
+    }
+    
+    return filtered.sort((a, b) => b.amount - a.amount);
+  }, [donations, filter, weekAgo, monthAgo]);
 
-  const sortedDonations = [...filteredDonations].sort((a, b) => b.amount - a.amount);
+  // Rendu des médailles selon le rang
+  const getMedal = (index: number) => {
+    if (index === 0) return <Trophy className="w-5 h-5 text-yellow-500" />;
+    if (index === 1) return <Medal className="w-5 h-5 text-gray-400" />;
+    if (index === 2) return <Medal className="w-5 h-5 text-amber-600" />;
+    return <span className="w-5 h-5 text-gray-400 font-medium">{index + 1}</span>;
+  };
 
   if (loading) {
     return (
-      <div className="container mx-auto px-6 py-20 text-center">
-        <div className="text-purple-600 text-xl">Chargement du tableau d'honneur...</div>
+      <div className="min-h-screen bg-gradient-to-br from-purple-50 to-white flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Chargement du tableau d'honneur...</p>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="container mx-auto px-6 py-20">
-      <div className="flex justify-between items-center mb-8 flex-wrap gap-4">
-        <h1 className="text-4xl font-bold text-purple-700">Tableau d'Honneur</h1>
-        <Link to="/" className="inline-flex items-center gap-2 bg-purple-100 text-purple-700 px-5 py-2 rounded-full hover:bg-purple-200 transition">
-          <ArrowLeft size={20} />
-          Retour à l'accueil
-        </Link>
-      </div>
+    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-purple-50">
+      <div className="container mx-auto px-4 sm:px-6 py-12 md:py-20">
+        {/* Header avec texte inspirant */}
+        <motion.div 
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          className="text-center mb-12"
+        >
+          <div className="inline-flex items-center gap-2 bg-purple-100 px-4 py-2 rounded-full mb-4">
+            <Crown className="w-4 h-4 text-purple-600" />
+            <span className="text-sm text-purple-600 font-medium">Reconnaissance divine</span>
+          </div>
+          
+          <h1 className="text-3xl md:text-5xl font-bold text-gray-800 mb-4">
+            Tableau d'<span className="bg-gradient-to-r from-purple-600 to-purple-400 bg-clip-text text-transparent">Honneur</span>
+          </h1>
+          
+          <div className="max-w-2xl mx-auto">
+            <p className="text-gray-600 mb-3">
+              « Que ta main gauche ne sache pas ce que fait ta main droite, afin que ton aumône soit dans le secret ; 
+              et ton Père, qui voit dans le secret, te le rendra. » (Matthieu 6:3-4)
+            </p>
+            <p className="text-sm text-gray-500 italic">
+              Ce tableau honore la générosité des cœurs qui soutiennent l'œuvre de Dieu. 
+              Que Dieu bénisse abondamment chaque donateur !
+            </p>
+          </div>
+        </motion.div>
 
-      <div className="flex flex-wrap justify-center gap-4 mb-8">
-        <button onClick={() => setFilter("week")} className={`px-6 py-2 rounded-full transition ${filter === "week" ? "bg-purple-600 text-white" : "bg-gray-200 text-gray-700 hover:bg-purple-100"}`}>
-          Cette semaine
-        </button>
-        <button onClick={() => setFilter("month")} className={`px-6 py-2 rounded-full transition ${filter === "month" ? "bg-purple-600 text-white" : "bg-gray-200 text-gray-700 hover:bg-purple-100"}`}>
-          Ce mois
-        </button>
-        <button onClick={() => setFilter("top")} className={`px-6 py-2 rounded-full transition ${filter === "top" ? "bg-purple-600 text-white" : "bg-gray-200 text-gray-700 hover:bg-purple-100"}`}>
-          Meilleurs dons
-        </button>
-        <button onClick={() => setFilter("all")} className={`px-6 py-2 rounded-full transition ${filter === "all" ? "bg-purple-600 text-white" : "bg-gray-200 text-gray-700 hover:bg-purple-100"}`}>
-          Tous les dons
-        </button>
-      </div>
+        {/* Filtres élégants - sans emojis */}
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.1 }}
+          className="flex flex-wrap justify-center gap-3 mb-10"
+        >
+          {[
+            { id: "week", label: "Cette semaine", icon: CalendarDays },
+            { id: "month", label: "Ce mois", icon: Calendar },
+            { id: "top", label: "Meilleurs dons", icon: Award },
+            { id: "all", label: "Tous les dons", icon: List },
+          ].map((btn) => (
+            <button
+              key={btn.id}
+              onClick={() => setFilter(btn.id as typeof filter)}
+              className={`px-5 py-2.5 rounded-xl font-medium transition-all duration-300 flex items-center gap-2 ${
+                filter === btn.id
+                  ? "bg-purple-600 text-white shadow-md"
+                  : "bg-white text-gray-600 hover:bg-purple-50 border border-gray-200"
+              }`}
+            >
+              <btn.icon size={18} />
+              {btn.label}
+            </button>
+          ))}
+        </motion.div>
 
-      <div className="overflow-x-auto">
-        <table className="min-w-full bg-white rounded-xl shadow-md overflow-hidden">
-          <thead className="bg-purple-600 text-white">
-            <tr>
-              <th className="py-3 px-6 text-left">Rang</th>
-              <th className="py-3 px-6 text-left">Nom</th>
-              <th className="py-3 px-6 text-left">Ville / Quartier</th>
-              <th className="py-3 px-6 text-right">Montant</th>
-              <th className="py-3 px-6 text-left">Date</th>
-            </tr>
-          </thead>
-          <tbody>
-            {sortedDonations.length === 0 ? (
-              <tr>
-                <td colSpan={5} className="text-center py-8 text-gray-500">
-                  Aucun don pour cette période.
-                </td>
-              </tr>
-            ) : (
-              sortedDonations.map((don, idx) => (
-                <tr key={don.id} className="border-b hover:bg-gray-50">
-                  <td className="py-3 px-6 font-semibold">{idx + 1}</td>
-                  <td className="py-3 px-6">{don.name}</td>
-                  <td className="py-3 px-6">{don.city}</td>
-                  <td className="py-3 px-6 text-right font-bold text-purple-600">{don.amount} €</td>
-                  <td className="py-3 px-6 text-gray-600">{new Date(don.date).toLocaleDateString()}</td>
+        {/* Message selon le filtre */}
+        {filteredDonations.length > 0 && (
+          <motion.p 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="text-center text-sm text-gray-500 mb-6"
+          >
+            <Heart className="inline w-4 h-4 text-purple-600 mr-1" />
+            {filter === "week" && "Voici les dons reçus cette semaine. Que Dieu bénisse chaque cœur généreux !"}
+            {filter === "month" && "Voici les dons reçus ce mois-ci. Merci pour votre fidélité !"}
+            {filter === "top" && "Ces généreux donateurs se distinguent par leur soutien exceptionnel. Qu'ils soient bénis !"}
+            {filter === "all" && "Tous les dons enregistrés. Chaque contribution, grande ou petite, est précieuse devant Dieu."}
+          </motion.p>
+        )}
+
+        {/* Tableau */}
+        <motion.div 
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.2 }}
+          className="bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-100"
+        >
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead className="bg-gradient-to-r from-purple-600 to-purple-500">
+                <tr>
+                  <th className="py-4 px-4 text-left text-white font-semibold">Rang</th>
+                  <th className="py-4 px-4 text-left text-white font-semibold">Donateur</th>
+                  <th className="py-4 px-4 text-left text-white font-semibold hidden md:table-cell">Ville / Quartier</th>
+                  <th className="py-4 px-4 text-right text-white font-semibold">Montant</th>
+                  <th className="py-4 px-4 text-left text-white font-semibold hidden lg:table-cell">Date</th>
                 </tr>
-              ))
-            )}
-          </tbody>
-        </table>
+              </thead>
+              <tbody>
+                {filteredDonations.length === 0 ? (
+                  <tr>
+                    <td colSpan={5} className="text-center py-16">
+                      <HandHeart className="w-12 h-12 text-gray-300 mx-auto mb-3" />
+                      <p className="text-gray-500">Aucun don pour cette période.</p>
+                      <p className="text-sm text-gray-400 mt-1">Soyez le premier à faire un don !</p>
+                    </td>
+                  </tr>
+                ) : (
+                  filteredDonations.map((don, idx) => (
+                    <motion.tr 
+                      key={don.id} 
+                      initial={{ opacity: 0, x: -20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: idx * 0.03 }}
+                      className="border-b border-gray-100 hover:bg-purple-50/30 transition-colors group"
+                    >
+                      <td className="py-4 px-4">
+                        <div className="flex items-center gap-2">
+                          {getMedal(idx)}
+                          {idx < 3 && (
+                            <span className="text-xs font-medium text-amber-600 bg-amber-50 px-2 py-0.5 rounded-full">
+                              Top {idx + 1}
+                            </span>
+                          )}
+                        </div>
+                      </td>
+                      <td className="py-4 px-4">
+                        <div>
+                          <p className="font-semibold text-gray-800">{don.name}</p>
+                          <p className="text-xs text-gray-400 md:hidden">{don.city}</p>
+                        </div>
+                      </td>
+                      <td className="py-4 px-4 hidden md:table-cell text-gray-600">{don.city}</td>
+                      <td className="py-4 px-4 text-right">
+                        <span className="font-bold text-purple-600 text-lg">{don.amount.toLocaleString()} €</span>
+                      </td>
+                      <td className="py-4 px-4 hidden lg:table-cell text-gray-500 text-sm">
+                        {new Date(don.date).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })}
+                      </td>
+                    </motion.tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
+        </motion.div>
+
+        {/* Message de gratitude */}
+        {filteredDonations.length > 0 && (
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.4 }}
+            className="mt-10 text-center"
+          >
+            <div className="inline-flex items-center gap-2 bg-purple-50 px-6 py-3 rounded-full">
+              <Star className="w-4 h-4 text-amber-500 fill-amber-500" />
+              <p className="text-sm text-gray-600">
+                « Donnez, et l'on vous donnera : une bonne mesure, tassée, secouée, débordante » (Luc 6:38)
+              </p>
+              <Star className="w-4 h-4 text-amber-500 fill-amber-500" />
+            </div>
+          </motion.div>
+        )}
+
+        {/* Bouton retour */}
+        <div className="mt-10 text-center">
+          <Link 
+            to="/" 
+            className="inline-flex items-center gap-2 text-purple-600 hover:text-purple-700 transition font-medium group"
+          >
+            <ArrowLeft size={18} className="group-hover:-translate-x-1 transition" />
+            Retour à l'accueil
+          </Link>
+        </div>
       </div>
     </div>
   );
