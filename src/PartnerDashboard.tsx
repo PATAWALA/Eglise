@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { 
-  LogOut, 
-  Heart, 
+import {
+  LogOut,
+  Heart,
   TrendingUp,
   Download,
   Gift,
@@ -124,7 +124,7 @@ const PartnerDashboard = () => {
   const [showNotifications, setShowNotifications] = useState(false);
   const [activeTab, setActiveTab] = useState<'overview' | 'donations' | 'analytics' | 'settings'>('overview');
   const [showGiveModal, setShowGiveModal] = useState(false);
-  
+
   // Formulaire de don (identique à la landing page)
   const [donationForm, setDonationForm] = useState({
     nomComplet: '',
@@ -135,10 +135,10 @@ const PartnerDashboard = () => {
     selectedPaymentMethod: 'mtn',
     anonymous: false
   });
-  
+
   const [donating, setDonating] = useState(false);
   const [copied, setCopied] = useState(false);
-  
+
   const navigate = useNavigate();
 
   // Charger les données
@@ -150,7 +150,7 @@ const PartnerDashboard = () => {
 
   const loadPartnerData = async () => {
     const { data: { user } } = await supabase.auth.getUser();
-    
+
     if (!user) {
       navigate('/devenir-partenaire');
       return;
@@ -177,7 +177,7 @@ const PartnerDashboard = () => {
 
   const loadPartnerDonations = async () => {
     const { data: { user } } = await supabase.auth.getUser();
-    
+
     if (!user) return;
 
     const { data: partnerData } = await supabase
@@ -220,7 +220,7 @@ const PartnerDashboard = () => {
   const handleUpdateProfile = async () => {
     setUpdating(true);
     setUpdateMessage(null);
-    
+
     try {
       const { error } = await supabase
         .from('partners')
@@ -235,7 +235,7 @@ const PartnerDashboard = () => {
         .eq('id', partner?.id);
 
       if (error) throw error;
-      
+
       setPartner(prev => ({ ...prev!, ...profileForm }));
       setUpdateMessage({ type: 'success', text: 'Profil mis à jour avec succès !' });
       setTimeout(() => setUpdateMessage(null), 3000);
@@ -252,17 +252,17 @@ const PartnerDashboard = () => {
       setUpdateMessage({ type: 'error', text: 'Les mots de passe ne correspondent pas' });
       return;
     }
-    
+
     setUpdating(true);
     setUpdateMessage(null);
-    
+
     try {
       const { error } = await supabase.auth.updateUser({
         password: passwordForm.newPassword
       });
-      
+
       if (error) throw error;
-      
+
       setUpdateMessage({ type: 'success', text: 'Mot de passe mis à jour avec succès !' });
       setShowPasswordModal(false);
       setPasswordForm({ newPassword: '', confirmPassword: '' });
@@ -279,7 +279,7 @@ const PartnerDashboard = () => {
       setUpdateMessage({ type: 'error', text: 'Veuillez remplir tous les champs avant de donner.' });
       return;
     }
-    
+
     const amountNumber = parseFloat(donationForm.donationAmount);
     if (isNaN(amountNumber) || amountNumber <= 0) {
       setUpdateMessage({ type: 'error', text: 'Veuillez entrer un montant valide.' });
@@ -287,10 +287,10 @@ const PartnerDashboard = () => {
     }
 
     setDonating(true);
-    
+
     const donationTypeName = donationTypes.find(t => t.id === donationForm.selectedDonationType)?.name || donationForm.selectedDonationType;
     const paymentMethodName = paymentMethods.find(m => m.id === donationForm.selectedPaymentMethod)?.name || donationForm.selectedPaymentMethod;
-    
+
     try {
       const newDonation = {
         name: donationForm.anonymous ? 'Anonyme' : donationForm.nomComplet,
@@ -301,17 +301,17 @@ const PartnerDashboard = () => {
         phone: donationForm.phoneNumber,
         date: new Date().toISOString()
       };
-      
+
       const { error } = await supabase
         .from('donations')
         .insert([newDonation]);
-      
+
       if (error) throw error;
-      
+
       setDonations(prev => [newDonation as Donation, ...prev]);
       setUpdateMessage({ type: 'success', text: `✅ Don effectué avec succès !\n📝 ${donationTypeName} : ${amountNumber} €\n🙏 ${donationForm.nomComplet}\n💳 Paiement : ${paymentMethodName}\n\nQue Dieu vous bénisse abondamment !` });
       setShowGiveModal(false);
-      
+
       setDonationForm({
         nomComplet: partner?.name || '',
         villeQuartier: partner?.city || '',
@@ -321,7 +321,7 @@ const PartnerDashboard = () => {
         selectedPaymentMethod: 'mtn',
         anonymous: false
       });
-      
+
       setTimeout(() => setUpdateMessage(null), 5000);
     } catch (error) {
       setUpdateMessage({ type: 'error', text: 'Erreur lors du traitement du don' });
@@ -347,31 +347,31 @@ const PartnerDashboard = () => {
       default:
         break;
     }
-    
+
     if (searchTerm) {
-      filtered = filtered.filter(d => 
+      filtered = filtered.filter(d =>
         d.donation_type.toLowerCase().includes(searchTerm.toLowerCase()) ||
         d.city.toLowerCase().includes(searchTerm.toLowerCase())
       );
     }
-    
+
     if (selectedType !== 'all') {
       filtered = filtered.filter(d => d.donation_type === selectedType);
     }
-    
+
     return filtered;
   };
 
   const filteredDonations = getFilteredDonations();
-  
+
   const getStats = () => {
     const totalAmount = filteredDonations.reduce((sum, d) => sum + d.amount, 0);
     const donationCount = filteredDonations.length;
     const averageAmount = donationCount > 0 ? totalAmount / donationCount : 0;
-    
+
     const thisMonth = filteredDonations.filter(d => new Date(d.date) >= startOfMonth(new Date()));
     const thisMonthTotal = thisMonth.reduce((sum, d) => sum + d.amount, 0);
-    
+
     const lastWeek = filteredDonations.filter(d => new Date(d.date) >= subDays(new Date(), 7));
     const previousWeek = filteredDonations.filter(d => {
       const date = new Date(d.date);
@@ -380,16 +380,16 @@ const PartnerDashboard = () => {
     const lastWeekTotal = lastWeek.reduce((sum, d) => sum + d.amount, 0);
     const previousWeekTotal = previousWeek.reduce((sum, d) => sum + d.amount, 0);
     const weeklyGrowth = previousWeekTotal > 0 ? ((lastWeekTotal - previousWeekTotal) / previousWeekTotal) * 100 : 0;
-    
+
     const uniqueDonors = new Set(filteredDonations.map(d => d.name)).size;
     const highestDonation = Math.max(...filteredDonations.map(d => d.amount), 0);
-    
+
     const typeCount = filteredDonations.reduce((acc, d) => {
       acc[d.donation_type] = (acc[d.donation_type] || 0) + 1;
       return acc;
     }, {} as Record<string, number>);
     const mostFrequentType = Object.keys(typeCount).reduce((a, b) => typeCount[a] > typeCount[b] ? a : b, 'Aucun');
-    
+
     return {
       totalAmount,
       donationCount,
@@ -403,13 +403,13 @@ const PartnerDashboard = () => {
   };
 
   const stats = getStats();
-  
+
   const getDailyData = () => {
     const last30Days = eachDayOfInterval({
       start: subDays(new Date(), 29),
       end: new Date()
     });
-    
+
     return last30Days.map(day => {
       const dayDonations = filteredDonations.filter(d => isSameDay(new Date(d.date), day));
       return {
@@ -419,31 +419,31 @@ const PartnerDashboard = () => {
       };
     });
   };
-  
+
   const getDonationsByType = () => {
     const typeMap = filteredDonations.reduce((acc, d) => {
       acc[d.donation_type] = (acc[d.donation_type] || 0) + d.amount;
       return acc;
     }, {} as Record<string, number>);
-    
+
     return Object.entries(typeMap).map(([name, value]) => ({ name, value }));
   };
-  
+
   const getPaymentMethods = () => {
     const methodMap = filteredDonations.reduce((acc, d) => {
       acc[d.payment_method] = (acc[d.payment_method] || 0) + d.amount;
       return acc;
     }, {} as Record<string, number>);
-    
+
     return Object.entries(methodMap).map(([name, value]) => ({ name, value }));
   };
-  
+
   const COLORS = ['#8B5CF6', '#EC4899', '#06B6D4', '#F59E0B', '#10B981', '#EF4444'];
-  
+
   const dailyData = getDailyData();
   const typeData = getDonationsByType();
   const methodData = getPaymentMethods();
-  
+
   const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text);
     setCopied(true);
@@ -474,8 +474,8 @@ const PartnerDashboard = () => {
           <div className="bg-white rounded-2xl shadow-xl p-8 max-w-md">
             <Shield className="w-16 h-16 text-yellow-500 mx-auto mb-4" />
             <p className="text-gray-600 mb-4">Votre compte n'est pas encore approuvé.</p>
-            <button 
-              onClick={() => navigate('/')} 
+            <button
+              onClick={() => navigate('/')}
               className="text-purple-600 hover:text-purple-700 font-medium"
             >
               Retour à l'accueil
@@ -504,12 +504,14 @@ const PartnerDashboard = () => {
               <button
                 onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
                 className="p-2 hover:bg-gray-100 rounded-lg transition"
+                aria-label={sidebarCollapsed ? "Agrandir la barre latérale" : "Réduire la barre latérale"}
+                type="button"
               >
                 <Menu size={20} />
               </button>
             </div>
           </div>
-          
+
           <nav className="flex-1 p-4 space-y-2">
             <button
               onClick={() => setActiveTab('overview')}
@@ -518,11 +520,12 @@ const PartnerDashboard = () => {
                   ? 'bg-purple-50 text-purple-600'
                   : 'text-gray-600 hover:bg-gray-100'
               }`}
+              type="button"
             >
               <TrendingUp size={20} />
               {!sidebarCollapsed && <span className="font-medium">Vue d'ensemble</span>}
             </button>
-            
+
             <button
               onClick={() => setActiveTab('donations')}
               className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${
@@ -530,11 +533,12 @@ const PartnerDashboard = () => {
                   ? 'bg-purple-50 text-purple-600'
                   : 'text-gray-600 hover:bg-gray-100'
               }`}
+              type="button"
             >
               <Heart size={20} />
               {!sidebarCollapsed && <span className="font-medium">Mes dons</span>}
             </button>
-            
+
             <button
               onClick={() => setActiveTab('analytics')}
               className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${
@@ -542,11 +546,12 @@ const PartnerDashboard = () => {
                   ? 'bg-purple-50 text-purple-600'
                   : 'text-gray-600 hover:bg-gray-100'
               }`}
+              type="button"
             >
               <BarChart3 size={20} />
               {!sidebarCollapsed && <span className="font-medium">Analytiques</span>}
             </button>
-            
+
             <button
               onClick={() => setActiveTab('settings')}
               className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${
@@ -554,16 +559,19 @@ const PartnerDashboard = () => {
                   ? 'bg-purple-50 text-purple-600'
                   : 'text-gray-600 hover:bg-gray-100'
               }`}
+              type="button"
             >
               <Settings size={20} />
               {!sidebarCollapsed && <span className="font-medium">Paramètres</span>}
             </button>
           </nav>
-          
+
           <div className="p-4 border-t border-gray-200">
             <button
               onClick={handleLogout}
               className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-red-600 hover:bg-red-50 transition-all"
+              aria-label="Déconnexion"
+              type="button"
             >
               <LogOut size={20} />
               {!sidebarCollapsed && <span className="font-medium">Déconnexion</span>}
@@ -571,7 +579,7 @@ const PartnerDashboard = () => {
           </div>
         </div>
       </aside>
-      
+
       {/* Main Content */}
       <main className={`transition-all duration-300 ${sidebarCollapsed ? 'ml-20' : 'ml-72'}`}>
         {/* Header */}
@@ -589,19 +597,21 @@ const PartnerDashboard = () => {
                   Bienvenue, {partner.name} ! Que Dieu vous bénisse.
                 </p>
               </div>
-              
+
               <div className="flex items-center gap-4">
                 <div className="relative">
                   <button
                     onClick={() => setShowNotifications(!showNotifications)}
                     className="relative p-2 hover:bg-gray-100 rounded-lg transition"
+                    aria-label="Notifications"
+                    type="button"
                   >
                     <Bell size={20} />
                     {notifications.filter(n => !n.read).length > 0 && (
                       <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
                     )}
                   </button>
-                  
+
                   {showNotifications && (
                     <div className="absolute right-0 mt-2 w-80 bg-white rounded-xl shadow-lg border border-gray-200 z-20">
                       <div className="p-4 border-b border-gray-200">
@@ -627,10 +637,11 @@ const PartnerDashboard = () => {
                     </div>
                   )}
                 </div>
-                
+
                 <button
                   onClick={() => setShowGiveModal(true)}
                   className="flex items-center gap-2 bg-purple-600 text-white px-5 py-2 rounded-xl hover:bg-purple-700 transition-all"
+                  type="button"
                 >
                   <Gift size={18} />
                   <span className="font-medium">Faire un don</span>
@@ -639,7 +650,7 @@ const PartnerDashboard = () => {
             </div>
           </div>
         </header>
-        
+
         <div className="p-8">
           {updateMessage && (
             <div className={`mb-6 p-4 rounded-xl whitespace-pre-line ${
@@ -648,7 +659,7 @@ const PartnerDashboard = () => {
               {updateMessage.text}
             </div>
           )}
-          
+
           {/* Vue d'ensemble */}
           {activeTab === 'overview' && (
             <>
@@ -666,7 +677,7 @@ const PartnerDashboard = () => {
                   <h3 className="text-2xl font-bold text-gray-800">{stats.totalAmount.toLocaleString()} €</h3>
                   <p className="text-sm text-gray-500 mt-1">Total des dons</p>
                 </div>
-                
+
                 <div className="bg-white rounded-2xl shadow-sm p-6">
                   <div className="flex items-center justify-between mb-4">
                     <div className="p-3 bg-pink-100 rounded-xl">
@@ -676,7 +687,7 @@ const PartnerDashboard = () => {
                   <h3 className="text-2xl font-bold text-gray-800">{stats.donationCount}</h3>
                   <p className="text-sm text-gray-500 mt-1">Nombre de dons</p>
                 </div>
-                
+
                 <div className="bg-white rounded-2xl shadow-sm p-6">
                   <div className="flex items-center justify-between mb-4">
                     <div className="p-3 bg-blue-100 rounded-xl">
@@ -686,7 +697,7 @@ const PartnerDashboard = () => {
                   <h3 className="text-2xl font-bold text-gray-800">{stats.uniqueDonors}</h3>
                   <p className="text-sm text-gray-500 mt-1">Donateurs uniques</p>
                 </div>
-                
+
                 <div className="bg-white rounded-2xl shadow-sm p-6">
                   <div className="flex items-center justify-between mb-4">
                     <div className="p-3 bg-green-100 rounded-xl">
@@ -697,7 +708,7 @@ const PartnerDashboard = () => {
                   <p className="text-sm text-gray-500 mt-1">Montant moyen</p>
                 </div>
               </div>
-              
+
               <div className="bg-white rounded-2xl shadow-sm p-6 mb-8">
                 <div className="flex justify-between items-center mb-6">
                   <h2 className="text-lg font-semibold text-gray-800">Évolution des dons</h2>
@@ -707,6 +718,7 @@ const PartnerDashboard = () => {
                       className={`px-3 py-1 rounded-lg text-sm transition ${
                         filterPeriod === 'week' ? 'bg-purple-600 text-white' : 'bg-gray-100 text-gray-600'
                       }`}
+                      type="button"
                     >
                       Semaine
                     </button>
@@ -715,6 +727,7 @@ const PartnerDashboard = () => {
                       className={`px-3 py-1 rounded-lg text-sm transition ${
                         filterPeriod === 'month' ? 'bg-purple-600 text-white' : 'bg-gray-100 text-gray-600'
                       }`}
+                      type="button"
                     >
                       Mois
                     </button>
@@ -723,6 +736,7 @@ const PartnerDashboard = () => {
                       className={`px-3 py-1 rounded-lg text-sm transition ${
                         filterPeriod === 'year' ? 'bg-purple-600 text-white' : 'bg-gray-100 text-gray-600'
                       }`}
+                      type="button"
                     >
                       Année
                     </button>
@@ -744,13 +758,14 @@ const PartnerDashboard = () => {
                   </AreaChart>
                 </ResponsiveContainer>
               </div>
-              
+
               <div className="bg-white rounded-2xl shadow-sm p-6">
                 <div className="flex justify-between items-center mb-6">
                   <h2 className="text-lg font-semibold text-gray-800">Derniers dons</h2>
                   <button
                     onClick={() => setActiveTab('donations')}
                     className="text-purple-600 text-sm font-medium flex items-center gap-1"
+                    type="button"
                   >
                     Voir tout <ChevronRight size={16} />
                   </button>
@@ -777,7 +792,7 @@ const PartnerDashboard = () => {
               </div>
             </>
           )}
-          
+
           {/* Mes dons */}
           {activeTab === 'donations' && (
             <>
@@ -791,6 +806,7 @@ const PartnerDashboard = () => {
                           ? 'bg-purple-600 text-white'
                           : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                       }`}
+                      type="button"
                     >
                       7 jours
                     </button>
@@ -801,6 +817,7 @@ const PartnerDashboard = () => {
                           ? 'bg-purple-600 text-white'
                           : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                       }`}
+                      type="button"
                     >
                       30 jours
                     </button>
@@ -811,6 +828,7 @@ const PartnerDashboard = () => {
                           ? 'bg-purple-600 text-white'
                           : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                       }`}
+                      type="button"
                     >
                       Année
                     </button>
@@ -821,6 +839,7 @@ const PartnerDashboard = () => {
                           ? 'bg-purple-600 text-white'
                           : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                       }`}
+                      type="button"
                     >
                       Tous
                     </button>
@@ -834,12 +853,14 @@ const PartnerDashboard = () => {
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
                         className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg bg-white text-gray-800 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                        aria-label="Rechercher des dons"
                       />
                     </div>
                     <select
                       value={selectedType}
                       onChange={(e) => setSelectedType(e.target.value)}
                       className="px-4 py-2 border border-gray-300 rounded-lg bg-white text-gray-800 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                      aria-label="Filtrer par type de don"
                     >
                       <option value="all">Tous les types</option>
                       <option value="Offrande">Offrande</option>
@@ -870,6 +891,8 @@ const PartnerDashboard = () => {
                         URL.revokeObjectURL(url);
                       }}
                       className="flex items-center gap-2 px-4 py-2 bg-purple-100 text-purple-600 rounded-lg hover:bg-purple-200 transition"
+                      type="button"
+                      aria-label="Exporter les données CSV"
                     >
                       <Download size={18} />
                       Exporter
@@ -877,7 +900,7 @@ const PartnerDashboard = () => {
                   </div>
                 </div>
               </div>
-              
+
               <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
                 <div className="overflow-x-auto">
                   <table className="w-full">
@@ -929,7 +952,7 @@ const PartnerDashboard = () => {
               </div>
             </>
           )}
-          
+
           {/* Analytiques */}
           {activeTab === 'analytics' && (
             <>
@@ -937,30 +960,29 @@ const PartnerDashboard = () => {
                 <div className="bg-white rounded-2xl shadow-sm p-6">
                   <h2 className="text-lg font-semibold text-gray-800 mb-6">Répartition par type de don</h2>
                   <ResponsiveContainer width="100%" height={300}>
-
-<RePieChart>
-  <Pie
-    data={typeData}
-    cx="50%"
-    cy="50%"
-    labelLine={false}
-    label={({ name, percent }) => {
-      const pct = percent !== undefined ? percent : 0;
-      return `${name} ${(pct * 100).toFixed(0)}%`;
-    }}
-    outerRadius={80}
-    fill="#8884d8"
-    dataKey="value"
-  >
-    {typeData.map((entry, index) => (
-      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-    ))}
-  </Pie>
-  <Tooltip />
-</RePieChart>
+                    <RePieChart>
+                      <Pie
+                        data={typeData}
+                        cx="50%"
+                        cy="50%"
+                        labelLine={false}
+                        label={({ name, percent }) => {
+                          const pct = percent !== undefined ? percent : 0;
+                          return `${name} ${(pct * 100).toFixed(0)}%`;
+                        }}
+                        outerRadius={80}
+                        fill="#8884d8"
+                        dataKey="value"
+                      >
+                        {typeData.map((_, idx) => (
+                          <Cell key={`cell-${idx}`} fill={COLORS[idx % COLORS.length]} />
+                        ))}
+                      </Pie>
+                      <Tooltip />
+                    </RePieChart>
                   </ResponsiveContainer>
                 </div>
-                
+
                 <div className="bg-white rounded-2xl shadow-sm p-6">
                   <h2 className="text-lg font-semibold text-gray-800 mb-6">Méthodes de paiement</h2>
                   <ResponsiveContainer width="100%" height={300}>
@@ -974,7 +996,7 @@ const PartnerDashboard = () => {
                   </ResponsiveContainer>
                 </div>
               </div>
-              
+
               <div className="bg-white rounded-2xl shadow-sm p-6">
                 <h2 className="text-lg font-semibold text-gray-800 mb-6">Statistiques détaillées</h2>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
@@ -1000,7 +1022,7 @@ const PartnerDashboard = () => {
               </div>
             </>
           )}
-          
+
           {/* Paramètres */}
           {activeTab === 'settings' && (
             <div className="max-w-4xl">
@@ -1014,6 +1036,7 @@ const PartnerDashboard = () => {
                     <button
                       onClick={() => setEditingProfile(true)}
                       className="flex items-center gap-2 px-4 py-2 text-purple-600 border border-purple-300 rounded-lg hover:bg-purple-50 transition"
+                      type="button"
                     >
                       <Edit2 size={16} />
                       Modifier
@@ -1026,6 +1049,8 @@ const PartnerDashboard = () => {
                           setProfileForm(partner!);
                         }}
                         className="px-4 py-2 text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50 transition"
+                        type="button"
+                        aria-label="Annuler les modifications"
                       >
                         <X size={16} />
                       </button>
@@ -1033,6 +1058,7 @@ const PartnerDashboard = () => {
                         onClick={handleUpdateProfile}
                         disabled={updating}
                         className="flex items-center gap-2 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition disabled:opacity-50"
+                        type="button"
                       >
                         {updating ? <Loader2 size={16} className="animate-spin" /> : <Save size={16} />}
                         Sauvegarder
@@ -1040,7 +1066,7 @@ const PartnerDashboard = () => {
                     </div>
                   )}
                 </div>
-                
+
                 <div className="space-y-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">Nom complet</label>
@@ -1050,18 +1076,19 @@ const PartnerDashboard = () => {
                         value={profileForm.name || ''}
                         onChange={(e) => setProfileForm({ ...profileForm, name: e.target.value })}
                         className="w-full px-4 py-2 border border-gray-300 rounded-lg bg-white text-gray-800 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                        aria-label="Nom complet"
                       />
                     ) : (
                       <p className="text-gray-800">{partner.name}</p>
                     )}
                   </div>
-                  
+
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">Email</label>
                     <p className="text-gray-800">{partner.email}</p>
                     <p className="text-xs text-gray-500 mt-1">L'email ne peut pas être modifié</p>
                   </div>
-                  
+
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">Téléphone</label>
                     {editingProfile ? (
@@ -1070,12 +1097,13 @@ const PartnerDashboard = () => {
                         value={profileForm.phone || ''}
                         onChange={(e) => setProfileForm({ ...profileForm, phone: e.target.value })}
                         className="w-full px-4 py-2 border border-gray-300 rounded-lg bg-white text-gray-800 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                        aria-label="Numéro de téléphone"
                       />
                     ) : (
                       <p className="text-gray-800">{partner.phone || 'Non renseigné'}</p>
                     )}
                   </div>
-                  
+
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">Adresse</label>
                     {editingProfile ? (
@@ -1084,6 +1112,7 @@ const PartnerDashboard = () => {
                         onChange={(e) => setProfileForm({ ...profileForm, address: e.target.value })}
                         rows={3}
                         className="w-full px-4 py-2 border border-gray-300 rounded-lg bg-white text-gray-800 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                        aria-label="Adresse"
                       />
                     ) : (
                       <p className="text-gray-800">{partner.address || 'Non renseignée'}</p>
@@ -1091,7 +1120,7 @@ const PartnerDashboard = () => {
                   </div>
                 </div>
               </div>
-              
+
               <div className="bg-white rounded-2xl shadow-sm p-6">
                 <div className="flex justify-between items-center mb-6">
                   <div>
@@ -1101,12 +1130,13 @@ const PartnerDashboard = () => {
                   <button
                     onClick={() => setShowPasswordModal(true)}
                     className="flex items-center gap-2 px-4 py-2 text-purple-600 border border-purple-300 rounded-lg hover:bg-purple-50 transition"
+                    type="button"
                   >
                     <Lock size={16} />
                     Changer le mot de passe
                   </button>
                 </div>
-                
+
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">Code de référence partenaire</label>
                   <div className="flex items-center gap-2">
@@ -1116,6 +1146,8 @@ const PartnerDashboard = () => {
                     <button
                       onClick={() => copyToClipboard(partner.id || '')}
                       className="p-2 bg-gray-100 rounded-lg hover:bg-gray-200 transition"
+                      type="button"
+                      aria-label="Copier le code de référence"
                     >
                       {copied ? <Check size={18} className="text-green-500" /> : <Copy size={18} />}
                     </button>
@@ -1126,49 +1158,52 @@ const PartnerDashboard = () => {
           )}
         </div>
       </main>
-      
+
       {/* Modal de don - PETIT ET ÉPURÉ COMME LA VERSION CIBLE */}
       {showGiveModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
           <div className="bg-white rounded-2xl shadow-xl w-full max-w-md mx-4 p-6">
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-xl font-bold text-gray-800">Faire un don</h2>
-              <button onClick={() => setShowGiveModal(false)} className="p-1 hover:bg-gray-100 rounded-lg">
+              <button onClick={() => setShowGiveModal(false)} className="p-1 hover:bg-gray-100 rounded-lg" type="button" aria-label="Fermer">
                 <X size={20} />
               </button>
             </div>
-            
+
             <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Nom complet *</label>
-                <input 
-                  type="text" 
-                  placeholder="Votre nom et prénom" 
+                <input
+                  type="text"
+                  placeholder="Votre nom et prénom"
                   className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500"
-                  value={donationForm.nomComplet} 
+                  value={donationForm.nomComplet}
                   onChange={(e) => setDonationForm({ ...donationForm, nomComplet: e.target.value })}
+                  aria-label="Nom complet"
                 />
               </div>
-              
+
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Ville / Quartier *</label>
-                <input 
-                  type="text" 
-                  placeholder="Votre ville ou quartier" 
+                <input
+                  type="text"
+                  placeholder="Votre ville ou quartier"
                   className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500"
-                  value={donationForm.villeQuartier} 
+                  value={donationForm.villeQuartier}
                   onChange={(e) => setDonationForm({ ...donationForm, villeQuartier: e.target.value })}
+                  aria-label="Ville ou quartier"
                 />
               </div>
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Téléphone (pour confirmation) *</label>
-                <input 
-                  type="tel" 
-                  placeholder="+229 XX XX XX XX" 
+                <input
+                  type="tel"
+                  placeholder="+229 XX XX XX XX"
                   className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500"
-                  value={donationForm.phoneNumber} 
+                  value={donationForm.phoneNumber}
                   onChange={(e) => setDonationForm({ ...donationForm, phoneNumber: e.target.value })}
+                  aria-label="Numéro de téléphone"
                 />
               </div>
 
@@ -1178,6 +1213,7 @@ const PartnerDashboard = () => {
                   value={donationForm.selectedDonationType}
                   onChange={(e) => setDonationForm({ ...donationForm, selectedDonationType: e.target.value })}
                   className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                  aria-label="Type de don"
                 >
                   {donationTypes.map((type) => (
                     <option key={type.id} value={type.id}>{type.name} - {type.description}</option>
@@ -1187,12 +1223,13 @@ const PartnerDashboard = () => {
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Montant (€) *</label>
-                <input 
-                  type="number" 
-                  placeholder="Montant en euros" 
+                <input
+                  type="number"
+                  placeholder="Montant en euros"
                   className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500"
-                  value={donationForm.donationAmount} 
+                  value={donationForm.donationAmount}
                   onChange={(e) => setDonationForm({ ...donationForm, donationAmount: e.target.value })}
+                  aria-label="Montant du don"
                 />
               </div>
 
@@ -1202,6 +1239,7 @@ const PartnerDashboard = () => {
                   value={donationForm.selectedPaymentMethod}
                   onChange={(e) => setDonationForm({ ...donationForm, selectedPaymentMethod: e.target.value })}
                   className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                  aria-label="Moyen de paiement"
                 >
                   {paymentMethods.map((method) => (
                     <option key={method.id} value={method.id}>{method.name}</option>
@@ -1215,14 +1253,16 @@ const PartnerDashboard = () => {
                   checked={donationForm.anonymous}
                   onChange={(e) => setDonationForm({ ...donationForm, anonymous: e.target.checked })}
                   className="rounded border-gray-300 text-purple-600 focus:ring-purple-500"
+                  aria-label="Faire un don anonyme"
                 />
                 <span className="text-sm text-gray-700">Faire un don anonyme</span>
               </label>
 
-              <button 
-                onClick={handleGiveDonation} 
-                disabled={donating} 
+              <button
+                onClick={handleGiveDonation}
+                disabled={donating}
                 className="w-full py-3 rounded-lg transition flex items-center justify-center gap-2 bg-purple-600 hover:bg-purple-700 text-white disabled:bg-gray-400"
+                type="button"
               >
                 {donating ? (
                   <Loader2 size={18} className="animate-spin" />
@@ -1232,24 +1272,24 @@ const PartnerDashboard = () => {
                   </>
                 )}
               </button>
-              
+
               <p className="text-xs text-gray-500 text-center">Votre don est sécurisé. Vous recevrez un reçu par SMS et email.</p>
             </div>
           </div>
         </div>
       )}
-      
+
       {/* Modal de changement de mot de passe */}
       {showPasswordModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
           <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-6">
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-xl font-bold text-gray-800">Changer le mot de passe</h2>
-              <button onClick={() => setShowPasswordModal(false)} className="p-1 hover:bg-gray-100 rounded-lg">
+              <button onClick={() => setShowPasswordModal(false)} className="p-1 hover:bg-gray-100 rounded-lg" type="button" aria-label="Fermer">
                 <X size={20} />
               </button>
             </div>
-            
+
             <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">Nouveau mot de passe</label>
@@ -1259,17 +1299,20 @@ const PartnerDashboard = () => {
                     value={passwordForm.newPassword}
                     onChange={(e) => setPasswordForm({ ...passwordForm, newPassword: e.target.value })}
                     className="w-full px-4 py-2 pr-10 border border-gray-300 rounded-lg bg-white text-gray-800 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                    placeholder="Nouveau mot de passe"
+                    aria-label="Nouveau mot de passe"
                   />
                   <button
                     type="button"
                     onClick={() => setShowNewPassword(!showNewPassword)}
                     className="absolute right-3 top-1/2 transform -translate-y-1/2"
+                    aria-label={showNewPassword ? "Masquer le mot de passe" : "Afficher le mot de passe"}
                   >
                     {showNewPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                   </button>
                 </div>
               </div>
-              
+
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">Confirmer le mot de passe</label>
                 <input
@@ -1277,13 +1320,16 @@ const PartnerDashboard = () => {
                   value={passwordForm.confirmPassword}
                   onChange={(e) => setPasswordForm({ ...passwordForm, confirmPassword: e.target.value })}
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg bg-white text-gray-800 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                  placeholder="Confirmer le mot de passe"
+                  aria-label="Confirmer le mot de passe"
                 />
               </div>
-              
+
               <button
                 onClick={handleUpdatePassword}
                 disabled={updating}
                 className="w-full py-3 bg-purple-600 text-white rounded-xl font-medium hover:bg-purple-700 transition disabled:opacity-50"
+                type="button"
               >
                 {updating ? <Loader2 size={20} className="animate-spin mx-auto" /> : 'Mettre à jour'}
               </button>
