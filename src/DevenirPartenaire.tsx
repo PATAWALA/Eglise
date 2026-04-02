@@ -11,8 +11,7 @@ import {
   Phone, 
   Calendar, 
   Eye, 
-  EyeOff,
-  Sparkles
+  EyeOff
 } from 'lucide-react';
 import { supabase } from './lib/supabase';
 
@@ -193,7 +192,7 @@ const DevenirPartenaire = () => {
         </button>
 
         <div className="grid lg:grid-cols-2 gap-12 items-start">
-          {/* Colonne gauche - contenu inspirant minimal */}
+          {/* Colonne gauche - texte épuré */}
           <motion.div
             initial={{ opacity: 0, x: -30 }}
             animate={{ opacity: 1, x: 0 }}
@@ -214,31 +213,14 @@ const DevenirPartenaire = () => {
                 Votre fidélité nous permet de planifier et d'agir concrètement.
               </p>
             </div>
-
-            {/* Verset court */}
-            <div className="border-l-4 border-purple-300 pl-4">
-              <p className="text-gray-500 text-sm italic">
-                « Donnez, et l'on vous donnera : une bonne mesure, tassée, secouée, débordante. » (Luc 6:38)
-              </p>
-            </div>
-
-            {/* Avantages rapides */}
-            <div className="space-y-2">
-              <p className="text-sm font-medium text-gray-700">Vous bénéficiez :</p>
-              <ul className="space-y-1 text-sm text-gray-600">
-                <li className="flex items-center gap-2"><Heart size={14} className="text-purple-500" /> Espace personnel de suivi</li>
-                <li className="flex items-center gap-2"><Sparkles size={14} className="text-purple-500" /> Reçu fiscal annuel</li>
-                <li className="flex items-center gap-2"><Heart size={14} className="text-purple-500" /> Prière quotidienne</li>
-              </ul>
-            </div>
           </motion.div>
 
-          {/* Colonne droite - formulaire avec ombre */}
+          {/* Colonne droite - formulaire avec ombre renforcée */}
           <motion.div
             initial={{ opacity: 0, x: 30 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.5, delay: 0.2 }}
-            className="bg-white rounded-2xl shadow-2xl overflow-hidden"
+            className="bg-white rounded-2xl shadow-2xl hover:shadow-3xl transition-shadow duration-300 overflow-hidden"
           >
             {/* Onglets */}
             <div className="flex border-b border-gray-100">
