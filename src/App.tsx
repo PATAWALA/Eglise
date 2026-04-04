@@ -34,7 +34,8 @@ import {
 } from "lucide-react";
 import DevenirPartenaire from './DevenirPartenaire';
 import PartnerDashboard from './PartnerDashboard';
-import { useState, useEffect,useRef } from "react";
+import MaintenancePage from './MaintenancePage';
+import { useState, useEffect, useRef } from "react";
 import { Routes, Route, Link, Navigate } from "react-router-dom";
 import { supabase } from "./lib/supabase";
 import Leaderboard from "./Leaderboard";
@@ -70,7 +71,7 @@ const paymentMethods = [
   { id: "card", name: "Carte bancaire", icon: CreditCard },
 ];
 
-// Événements & Actualités - Images distinctes et professionnelles
+// Événements & Actualités
 const newsAndEvents = [
   {
     id: 1,
@@ -137,7 +138,7 @@ const newsAndEvents = [
   }
 ];
 
-// Composant LandingPage
+// Composant LandingPage (inchangé)
 const LandingPage = ({ onDonate }: { onDonate: (name: string, city: string, amount: number, donationType: string, paymentMethod: string, phone: string) => Promise<boolean> }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [donationAmount, setDonationAmount] = useState("");
@@ -234,7 +235,7 @@ const LandingPage = ({ onDonate }: { onDonate: (name: string, city: string, amou
 
   return (
     <>
-      {/* Navbar professionnelle et inspirante */}
+      {/* Navbar */}
       <nav className="fixed top-0 w-full bg-white/95 backdrop-blur-md shadow-md z-50">
         <div className="container mx-auto px-8 py-5">
           <div className="flex justify-between items-center">
@@ -561,7 +562,7 @@ const LandingPage = ({ onDonate }: { onDonate: (name: string, city: string, amou
         </div>
       </section>
 
-      {/* Section Contact - Moderne et inspirante */}
+      {/* Section Contact */}
       <section id="contact" className="py-20 bg-white">
         <div className="container mx-auto px-6">
           <motion.div {...fadeInUp} className="text-center max-w-2xl mx-auto mb-12">
@@ -708,9 +709,8 @@ const LandingPage = ({ onDonate }: { onDonate: (name: string, city: string, amou
         </div>
       </section>
 
-      {/* Footer professionnel */}
+      {/* Footer */}
       <footer className="bg-gray-900 text-white">
-        {/* Newsletter section */}
         <div className="border-b border-gray-800">
           <div className="container mx-auto px-6 py-12">
             <div className="max-w-3xl mx-auto text-center">
@@ -732,7 +732,6 @@ const LandingPage = ({ onDonate }: { onDonate: (name: string, city: string, amou
 
         <div className="container mx-auto px-6 py-12">
           <div className="grid md:grid-cols-4 gap-8">
-            {/* Logo et description */}
             <div>
               <div className="flex items-center gap-2 mb-4">
                 <Church className="h-7 w-7 text-purple-400" />
@@ -742,8 +741,6 @@ const LandingPage = ({ onDonate }: { onDonate: (name: string, city: string, amou
                 Donnez avec joie, car Dieu aime celui qui donne avec joie. Au service de la communauté depuis plus de 50 ans.
               </p>
             </div>
-
-            {/* Liens rapides */}
             <div>
               <h4 className="font-semibold mb-4 text-white">Navigation</h4>
               <ul className="space-y-2 text-gray-400 text-sm">
@@ -754,8 +751,6 @@ const LandingPage = ({ onDonate }: { onDonate: (name: string, city: string, amou
                 <li><a href="#contact" className="hover:text-purple-400 transition">Contact</a></li>
               </ul>
             </div>
-
-            {/* Actions */}
             <div>
               <h4 className="font-semibold mb-4 text-white">Agir</h4>
               <ul className="space-y-2 text-gray-400 text-sm">
@@ -765,28 +760,15 @@ const LandingPage = ({ onDonate }: { onDonate: (name: string, city: string, amou
                 <li><a href="#" className="hover:text-purple-400 transition">Prier pour nous</a></li>
               </ul>
             </div>
-
-            {/* Contact footer */}
             <div>
               <h4 className="font-semibold mb-4 text-white">Contact</h4>
               <ul className="space-y-2 text-gray-400 text-sm">
-                <li className="flex items-center gap-2">
-                  <MapPinIcon size={14} />
-                  <span>Abidjan, Côte d'Ivoire</span>
-                </li>
-                <li className="flex items-center gap-2">
-                  <Phone size={14} />
-                  <span>+225 07 00 00 00</span>
-                </li>
-                <li className="flex items-center gap-2">
-                  <Mail size={14} />
-                  <span>contact@eglise-catholique.ci</span>
-                </li>
+                <li className="flex items-center gap-2"><MapPinIcon size={14} /> <span>Abidjan, Côte d'Ivoire</span></li>
+                <li className="flex items-center gap-2"><Phone size={14} /> <span>+225 07 00 00 00</span></li>
+                <li className="flex items-center gap-2"><Mail size={14} /> <span>contact@eglise-catholique.ci</span></li>
               </ul>
             </div>
           </div>
-
-          {/* Copyright */}
           <div className="border-t border-gray-800 mt-8 pt-6 text-center text-gray-500 text-sm">
             <p>&copy; {new Date().getFullYear()} Mon offrande en ligne. Tous droits réservés.</p>
             <p className="mt-1">Conçu avec ❤️ pour la communauté catholique de Côte d'Ivoire</p>
@@ -813,16 +795,9 @@ const LandingPage = ({ onDonate }: { onDonate: (name: string, city: string, amou
             >
               <div className="relative h-64">
                 <img src={selectedItem.image} alt={selectedItem.title} className="w-full h-full object-cover rounded-t-2xl" />
-                <button
-                  onClick={() => setSelectedItem(null)}
-                  className="absolute top-4 right-4 p-2 bg-white rounded-full shadow-lg hover:bg-gray-100 transition"
-                >
-                  <X size={20} />
-                </button>
+                <button onClick={() => setSelectedItem(null)} className="absolute top-4 right-4 p-2 bg-white rounded-full shadow-lg hover:bg-gray-100 transition"><X size={20} /></button>
                 <div className="absolute bottom-4 left-4">
-                  <span className={`px-3 py-1.5 rounded-xl text-sm font-medium ${
-                    selectedItem.type === 'event' ? 'bg-purple-600 text-white' : 'bg-emerald-500 text-white'
-                  }`}>
+                  <span className={`px-3 py-1.5 rounded-xl text-sm font-medium ${selectedItem.type === 'event' ? 'bg-purple-600 text-white' : 'bg-emerald-500 text-white'}`}>
                     {selectedItem.type === 'event' ? '📅 Événement' : '📰 Actualité'}
                   </span>
                 </div>
@@ -830,40 +805,16 @@ const LandingPage = ({ onDonate }: { onDonate: (name: string, city: string, amou
               <div className="p-6">
                 <h3 className="text-2xl font-bold text-gray-800 mb-3">{selectedItem.title}</h3>
                 <div className="flex flex-wrap gap-4 mb-4 text-sm text-gray-500">
-                  <div className="flex items-center gap-1">
-                    <Calendar size={16} />
-                    <span>{selectedItem.date}</span>
-                  </div>
-                  {selectedItem.time && (
-                    <div className="flex items-center gap-1">
-                      <Clock3 size={16} />
-                      <span>{selectedItem.time}</span>
-                    </div>
-                  )}
-                  <div className="flex items-center gap-1">
-                    <MapPin size={16} />
-                    <span>{selectedItem.location}</span>
-                  </div>
+                  <div className="flex items-center gap-1"><Calendar size={16} /> <span>{selectedItem.date}</span></div>
+                  {selectedItem.time && <div className="flex items-center gap-1"><Clock3 size={16} /> <span>{selectedItem.time}</span></div>}
+                  <div className="flex items-center gap-1"><MapPin size={16} /> <span>{selectedItem.location}</span></div>
                 </div>
-                <p className="text-gray-600 leading-relaxed mb-6">
-                  {selectedItem.fullDescription || selectedItem.description}
-                </p>
+                <p className="text-gray-600 leading-relaxed mb-6">{selectedItem.fullDescription || selectedItem.description}</p>
                 <div className="flex gap-3">
-                  <button
-                    onClick={() => {
-                      setSelectedItem(null);
-                      scrollToDonate();
-                    }}
-                    className="flex items-center gap-2 bg-purple-600 text-white px-6 py-2.5 rounded-xl hover:bg-purple-700 transition font-medium"
-                  >
+                  <button onClick={() => { setSelectedItem(null); scrollToDonate(); }} className="flex items-center gap-2 bg-purple-600 text-white px-6 py-2.5 rounded-xl hover:bg-purple-700 transition font-medium">
                     {selectedItem.type === 'event' ? 'Participer' : 'Soutenir'} <ArrowRight size={16} />
                   </button>
-                  <button
-                    onClick={() => setSelectedItem(null)}
-                    className="px-6 py-2.5 border border-gray-300 rounded-xl hover:bg-gray-50 transition font-medium"
-                  >
-                    Fermer
-                  </button>
+                  <button onClick={() => setSelectedItem(null)} className="px-6 py-2.5 border border-gray-300 rounded-xl hover:bg-gray-50 transition font-medium">Fermer</button>
                 </div>
               </div>
             </motion.div>
@@ -880,10 +831,16 @@ const ProtectedAdminRoute = () => {
   return isAuthenticated ? <AdminDashboard /> : <Navigate to="/admin-login" replace />;
 };
 
-// Composant principal avec routage
+// Composant principal avec routage (modifié pour éviter l'écran de chargement)
 function App() {
   const [donations, setDonations] = useState<Donation[]>([])
   const [loading, setLoading] = useState(true)
+  
+  // Initialisation immédiate : valeur par défaut ou cache sessionStorage
+  const [maintenanceMode, setMaintenanceMode] = useState<boolean>(() => {
+    const cached = sessionStorage.getItem('maintenance_mode');
+    return cached !== null ? cached === 'true' : false;
+  });
 
   const loadDonations = async () => {
     setLoading(true)
@@ -928,12 +885,30 @@ function App() {
     loadDonations()
   }, [])
 
+  // Mise à jour en arrière‑plan du mode maintenance (sans bloquer l'affichage)
+  useEffect(() => {
+    const checkMaintenance = async () => {
+      const { data, error } = await supabase
+        .from('site_settings')
+        .select('maintenance_mode')
+        .maybeSingle();
+      let mode = false;
+      if (!error && data) {
+        mode = data.maintenance_mode;
+      }
+      setMaintenanceMode(mode);
+      sessionStorage.setItem('maintenance_mode', String(mode));
+    };
+    checkMaintenance();
+  }, []);
+
+  // Plus d'écran de chargement : on utilise directement la valeur initiale
   return (
     <Routes>
-      <Route path="/" element={<LandingPage onDonate={addDonation} />} />
-      <Route path="/devenir-partenaire" element={<DevenirPartenaire />} />
+      <Route path="/" element={maintenanceMode ? <MaintenancePage /> : <LandingPage onDonate={addDonation} />} />
+      <Route path="/devenir-partenaire" element={maintenanceMode ? <MaintenancePage /> : <DevenirPartenaire />} />
       <Route path="/espace-partenaire" element={<PartnerDashboard />} />
-      <Route path="/tableau" element={<Leaderboard donations={donations} loading={loading} />} />
+      <Route path="/tableau" element={maintenanceMode ? <MaintenancePage /> : <Leaderboard donations={donations} loading={loading} />} />
       <Route path="/admin-login" element={<AdminLogin />} />
       <Route path="/admin" element={<ProtectedAdminRoute />} />
     </Routes>
