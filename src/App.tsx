@@ -798,7 +798,7 @@ const LandingPage = ({ onDonate }: { onDonate: (name: string, city: string, amou
                 <button onClick={() => setSelectedItem(null)} className="absolute top-4 right-4 p-2 bg-white rounded-full shadow-lg hover:bg-gray-100 transition"><X size={20} /></button>
                 <div className="absolute bottom-4 left-4">
                   <span className={`px-3 py-1.5 rounded-xl text-sm font-medium ${selectedItem.type === 'event' ? 'bg-purple-600 text-white' : 'bg-emerald-500 text-white'}`}>
-                    {selectedItem.type === 'event' ? '📅 Événement' : '📰 Actualité'}
+                    {selectedItem.type === 'event' ? ' Événement' : ' Actualité'}
                   </span>
                 </div>
               </div>
