@@ -1,4 +1,5 @@
-import { motion, AnimatePresence} from "framer-motion";
+
+import { motion, AnimatePresence } from "framer-motion";
 import {
   Heart,
   CreditCard,
@@ -138,7 +139,7 @@ const newsAndEvents = [
   }
 ];
 
-// Composant LandingPage (inchangé)
+// Composant LandingPage ultra responsive
 const LandingPage = ({ onDonate }: { onDonate: (name: string, city: string, amount: number, donationType: string, paymentMethod: string, phone: string) => Promise<boolean> }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [donationAmount, setDonationAmount] = useState("");
@@ -235,21 +236,21 @@ const LandingPage = ({ onDonate }: { onDonate: (name: string, city: string, amou
 
   return (
     <>
-      {/* Navbar */}
+      {/* Navbar responsive */}
       <nav className="fixed top-0 w-full bg-white/95 backdrop-blur-md shadow-md z-50">
-        <div className="container mx-auto px-8 py-5">
+        <div className="container mx-auto px-4 md:px-8 py-3 md:py-5">
           <div className="flex justify-between items-center">
             <Link to="/" className="flex items-center gap-2 group">
               <div className="relative">
-                <Church className="h-8 w-8 text-purple-600 group-hover:scale-110 transition-transform duration-300" />
-                <Sparkles className="h-3 w-3 text-amber-400 absolute -top-1 -right-1" />
+                <Church className="h-6 w-6 md:h-8 md:w-8 text-purple-600 group-hover:scale-110 transition-transform duration-300" />
+                <Sparkles className="h-2 w-2 md:h-3 md:w-3 text-amber-400 absolute -top-1 -right-1" />
               </div>
-              <span className="text-xl font-bold bg-gradient-to-r from-purple-700 to-purple-500 bg-clip-text text-transparent">
+              <span className="text-lg md:text-xl font-bold bg-gradient-to-r from-purple-700 to-purple-500 bg-clip-text text-transparent">
                 Mon offrande
               </span>
             </Link>
             
-            <div className="hidden md:flex items-center gap-10">
+            <div className="hidden md:flex items-center gap-6 lg:gap-10">
               <a href="#hero" className="text-gray-600 hover:text-purple-600 transition font-medium">Accueil</a>
               <a href="#about" className="text-gray-600 hover:text-purple-600 transition font-medium">À propos</a>
               <a href="#news" className="text-gray-600 hover:text-purple-600 transition font-medium">Événements & Actus</a>
@@ -260,7 +261,7 @@ const LandingPage = ({ onDonate }: { onDonate: (name: string, city: string, amou
             <div className="hidden md:block">
               <Link 
                 to="/devenir-partenaire" 
-                className="flex items-center gap-2 bg-purple-600 text-white px-6 py-2.5 rounded-xl hover:bg-purple-700 transition-all duration-300 shadow-md hover:shadow-lg font-medium"
+                className="flex items-center gap-2 bg-purple-600 text-white px-4 py-2 lg:px-6 lg:py-2.5 rounded-xl hover:bg-purple-700 transition-all duration-300 shadow-md hover:shadow-lg font-medium text-sm lg:text-base"
               >
                 <Crown size={18} />
                 Devenir partenaire
@@ -274,21 +275,21 @@ const LandingPage = ({ onDonate }: { onDonate: (name: string, city: string, amou
         </div>
         
         {mobileMenuOpen && (
-          <div className="md:hidden bg-white border-t py-4 px-6 flex flex-col space-y-3">
-            <a href="#hero" className="text-gray-700 py-2" onClick={() => setMobileMenuOpen(false)}>Accueil</a>
-            <a href="#about" className="text-gray-700 py-2" onClick={() => setMobileMenuOpen(false)}>À propos</a>
-            <a href="#news" className="text-gray-700 py-2" onClick={() => setMobileMenuOpen(false)}>Événements & Actus</a>
-            <Link to="/tableau" className="text-gray-700 py-2" onClick={() => setMobileMenuOpen(false)}>Donateurs</Link>
-            <a href="#contact" className="text-gray-700 py-2" onClick={() => setMobileMenuOpen(false)}>Contact</a>
-            <Link to="/devenir-partenaire" className="bg-purple-600 text-white px-5 py-2 rounded-xl text-center" onClick={() => setMobileMenuOpen(false)}>
+          <div className="md:hidden bg-white border-t py-4 px-6 flex flex-col space-y-4 shadow-lg">
+            <a href="#hero" className="text-gray-700 py-2 text-lg" onClick={() => setMobileMenuOpen(false)}>Accueil</a>
+            <a href="#about" className="text-gray-700 py-2 text-lg" onClick={() => setMobileMenuOpen(false)}>À propos</a>
+            <a href="#news" className="text-gray-700 py-2 text-lg" onClick={() => setMobileMenuOpen(false)}>Événements & Actus</a>
+            <Link to="/tableau" className="text-gray-700 py-2 text-lg" onClick={() => setMobileMenuOpen(false)}>Donateurs</Link>
+            <a href="#contact" className="text-gray-700 py-2 text-lg" onClick={() => setMobileMenuOpen(false)}>Contact</a>
+            <Link to="/devenir-partenaire" className="bg-purple-600 text-white px-5 py-3 rounded-xl text-center text-lg" onClick={() => setMobileMenuOpen(false)}>
               Devenir partenaire
             </Link>
           </div>
         )}
       </nav>
 
-      {/* Hero Section */}
-      <section id="hero" className="relative pt-32 pb-20 min-h-screen flex items-center overflow-hidden">
+      {/* Hero Section responsive */}
+      <section id="hero" className="relative pt-24 md:pt-32 pb-16 md:pb-20 min-h-[80vh] md:min-h-screen flex items-center overflow-hidden">
         <div className="absolute inset-0">
           <img
             src={heroImages[currentImage]}
@@ -306,22 +307,22 @@ const LandingPage = ({ onDonate }: { onDonate: (name: string, city: string, amou
           />
         </div>
         <div className="absolute inset-0 bg-black/50" />
-        <div className="container mx-auto px-6 relative z-10">
+        <div className="container mx-auto px-4 md:px-6 relative z-10">
           <motion.div {...fadeInUp} className="text-center text-white max-w-4xl mx-auto">
-            <h1 className="text-4xl md:text-5xl font-bold leading-tight">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold leading-tight">
               Donnez avec joie, car{" "}
               <span className="text-purple-300">Dieu aime celui qui donne avec joie</span>
             </h1>
-            <p className="mt-4 text-lg italic text-gray-100">
+            <p className="mt-4 text-base md:text-lg italic text-gray-100 px-2">
               « Il n'y a pas de plus grand amour que de donner sa vie pour ses amis » (Jean 15:13).
-              <br />
+              <br className="hidden sm:block" />
               En soutenant notre église, vous participez à l'œuvre de Dieu et venez en aide aux plus démunis.
             </p>
-            <div className="mt-8 flex flex-wrap gap-4 justify-center">
-              <button onClick={scrollToDonate} className="bg-purple-600 text-white px-8 py-3 rounded-xl hover:bg-purple-700 transition flex items-center gap-2 shadow-lg">
+            <div className="mt-8 flex flex-col sm:flex-row gap-4 justify-center px-4">
+              <button onClick={scrollToDonate} className="bg-purple-600 text-white px-6 py-3 md:px-8 md:py-3 rounded-xl hover:bg-purple-700 transition flex items-center justify-center gap-2 shadow-lg text-base">
                 Faire un don <ChevronRight size={18} />
               </button>
-              <Link to="/devenir-partenaire" className="border border-white text-white px-8 py-3 rounded-xl hover:bg-white/10 transition">
+              <Link to="/devenir-partenaire" className="border border-white text-white px-6 py-3 md:px-8 md:py-3 rounded-xl hover:bg-white/10 transition text-center text-base">
                 Devenir partenaire
               </Link>
             </div>
@@ -344,14 +345,14 @@ const LandingPage = ({ onDonate }: { onDonate: (name: string, city: string, amou
         </div>
       </section>
 
-      {/* Section À propos */}
-      <section id="about" className="py-20 bg-white">
-        <div className="container mx-auto px-6">
-          <div className="text-center max-w-2xl mx-auto mb-12">
-            <h2 className="text-3xl font-bold text-gray-800">Notre mission</h2>
-            <p className="text-gray-600 mt-3">Au service de Dieu et de la communauté depuis plus de 50 ans</p>
+      {/* Section À propos responsive */}
+      <section id="about" className="py-16 md:py-20 bg-white">
+        <div className="container mx-auto px-4 md:px-6">
+          <div className="text-center max-w-2xl mx-auto mb-10 md:mb-12">
+            <h2 className="text-2xl md:text-3xl font-bold text-gray-800">Notre mission</h2>
+            <p className="text-gray-600 mt-2 md:mt-3 text-sm md:text-base">Au service de Dieu et de la communauté depuis plus de 50 ans</p>
           </div>
-          <div className="grid md:grid-cols-3 gap-10">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-10">
             {[
               { icon: BookOpen, title: "Transmission de la foi", desc: "Annoncer l'Évangile et former les croyants à vivre leur foi au quotidien." },
               { icon: Heart, title: "Charité active", desc: "Soutenir les plus démunis à travers des actions concrètes et régulières." },
@@ -365,24 +366,24 @@ const LandingPage = ({ onDonate }: { onDonate: (name: string, city: string, amou
                 viewport={{ once: true }}
                 className="text-center p-6 rounded-xl shadow-md hover:shadow-xl transition bg-gray-50"
               >
-                <item.icon className="w-12 h-12 mx-auto text-purple-600" />
-                <h3 className="text-xl font-semibold mt-4">{item.title}</h3>
-                <p className="text-gray-600 mt-2">{item.desc}</p>
+                <item.icon className="w-10 h-10 md:w-12 md:h-12 mx-auto text-purple-600" />
+                <h3 className="text-lg md:text-xl font-semibold mt-4">{item.title}</h3>
+                <p className="text-gray-600 mt-2 text-sm md:text-base">{item.desc}</p>
               </motion.div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Section Événements & Actualités */}
-      <section id="news" className="py-20 bg-gray-50">
-        <div className="container mx-auto px-6">
-          <motion.div {...fadeInUp} className="text-center max-w-2xl mx-auto mb-12">
-            <h2 className="text-3xl font-bold text-gray-800">Événements & Actualités</h2>
-            <p className="text-gray-600 mt-3">Restez connecté à la vie de notre communauté</p>
+      {/* Section Événements & Actualités responsive */}
+      <section id="news" className="py-16 md:py-20 bg-gray-50">
+        <div className="container mx-auto px-4 md:px-6">
+          <motion.div {...fadeInUp} className="text-center max-w-2xl mx-auto mb-10 md:mb-12">
+            <h2 className="text-2xl md:text-3xl font-bold text-gray-800">Événements & Actualités</h2>
+            <p className="text-gray-600 mt-2 text-sm md:text-base">Restez connecté à la vie de notre communauté</p>
           </motion.div>
 
-          <div className="flex justify-center gap-3 mb-12">
+          <div className="flex flex-wrap justify-center gap-2 md:gap-3 mb-8 md:mb-12">
             {[
               { id: 'all', label: 'Tous' },
               { id: 'event', label: 'Événements', icon: CalendarDays },
@@ -391,7 +392,7 @@ const LandingPage = ({ onDonate }: { onDonate: (name: string, city: string, amou
               <button
                 key={filter.id}
                 onClick={() => setActiveFilter(filter.id as typeof activeFilter)}
-                className={`px-6 py-2.5 rounded-xl font-medium transition-all duration-300 flex items-center gap-2 ${
+                className={`px-4 py-2 md:px-6 md:py-2.5 rounded-xl font-medium transition-all duration-300 flex items-center gap-2 text-sm md:text-base ${
                   activeFilter === filter.id
                     ? 'bg-purple-600 text-white shadow-md'
                     : 'bg-white text-gray-600 hover:bg-gray-100 border border-gray-200'
@@ -403,7 +404,7 @@ const LandingPage = ({ onDonate }: { onDonate: (name: string, city: string, amou
             ))}
           </div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
             {filteredNews.map((item, index) => (
               <motion.div
                 key={item.id}
@@ -415,24 +416,24 @@ const LandingPage = ({ onDonate }: { onDonate: (name: string, city: string, amou
                 className="group cursor-pointer"
               >
                 <div className="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-2xl transition-all duration-500 hover:-translate-y-2">
-                  <div className="relative h-56 overflow-hidden">
+                  <div className="relative h-48 md:h-56 overflow-hidden">
                     <img
                       src={item.image}
                       alt={item.title}
                       className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
                     />
-                    <div className="absolute top-4 left-4">
-                      <span className={`px-3 py-1.5 rounded-xl text-xs font-medium shadow-md ${
+                    <div className="absolute top-3 left-3 md:top-4 md:left-4">
+                      <span className={`px-2 py-1 md:px-3 md:py-1.5 rounded-xl text-xs font-medium shadow-md ${
                         item.type === 'event' 
                           ? 'bg-purple-600 text-white' 
                           : 'bg-emerald-500 text-white'
                       }`}>
-                        {item.type === 'event' ? ' Événement' : ' Actualité'}
+                        {item.type === 'event' ? 'Événement' : 'Actualité'}
                       </span>
                     </div>
                   </div>
-                  <div className="p-6">
-                    <div className="flex items-center gap-3 text-xs text-gray-500 mb-3">
+                  <div className="p-4 md:p-6">
+                    <div className="flex flex-wrap items-center gap-2 md:gap-3 text-xs text-gray-500 mb-2 md:mb-3">
                       <div className="flex items-center gap-1">
                         <Calendar size={12} />
                         <span>{item.date}</span>
@@ -444,18 +445,18 @@ const LandingPage = ({ onDonate }: { onDonate: (name: string, city: string, amou
                         </div>
                       )}
                     </div>
-                    <h3 className="text-xl font-semibold text-gray-800 mb-2 line-clamp-2 group-hover:text-purple-600 transition-colors">
+                    <h3 className="text-lg md:text-xl font-semibold text-gray-800 mb-2 line-clamp-2 group-hover:text-purple-600 transition-colors">
                       {item.title}
                     </h3>
-                    <p className="text-gray-500 text-sm line-clamp-2 mb-4">
+                    <p className="text-gray-500 text-xs md:text-sm line-clamp-2 mb-3 md:mb-4">
                       {item.description}
                     </p>
                     <div className="flex items-center justify-between pt-3 border-t border-gray-100">
-                      <div className="flex items-center gap-1 text-xs text-gray-400">
+                      <div className="flex items-center gap-1 text-xs text-gray-400 truncate max-w-[150px] md:max-w-[200px]">
                         <MapPin size={12} />
-                        <span className="truncate max-w-[150px]">{item.location}</span>
+                        <span className="truncate">{item.location}</span>
                       </div>
-                      <span className="text-purple-600 text-sm font-medium flex items-center gap-1 group-hover:gap-2 transition-all">
+                      <span className="text-purple-600 text-xs md:text-sm font-medium flex items-center gap-1 group-hover:gap-2 transition-all">
                         Lire plus <ArrowRight size={14} />
                       </span>
                     </div>
@@ -467,12 +468,12 @@ const LandingPage = ({ onDonate }: { onDonate: (name: string, city: string, amou
         </div>
       </section>
 
-      {/* Donation form */}
-      <section id="donate" ref={donateSectionRef} className="py-20 bg-white">
-        <div className="container mx-auto px-6">
+      {/* Donation form responsive */}
+      <section id="donate" ref={donateSectionRef} className="py-16 md:py-20 bg-white">
+        <div className="container mx-auto px-4 md:px-6">
           <motion.div {...fadeInUp} className="text-center max-w-2xl mx-auto">
-            <h2 className="text-3xl font-bold text-gray-800">Faites un don aujourd'hui</h2>
-            <p className="text-gray-600 mt-3">
+            <h2 className="text-2xl md:text-3xl font-bold text-gray-800">Faites un don aujourd'hui</h2>
+            <p className="text-gray-600 mt-2 md:mt-3 text-sm md:text-base">
               « Donnez, et l'on vous donnera : une bonne mesure, tassée, secouée, débordante » (Luc 6:38).
             </p>
           </motion.div>
@@ -482,22 +483,22 @@ const LandingPage = ({ onDonate }: { onDonate: (name: string, city: string, amou
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
             viewport={{ once: true }}
-            className="max-w-2xl mx-auto mt-12 bg-gray-50 rounded-2xl shadow-xl p-8"
+            className="max-w-2xl mx-auto mt-8 md:mt-12 bg-gray-50 rounded-2xl shadow-xl p-5 md:p-8"
           >
-            <div className="grid md:grid-cols-2 gap-4 mb-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Nom complet *</label>
-                <input type="text" placeholder="Votre nom et prénom" className="w-full border border-gray-300 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-purple-500" value={nomComplet} onChange={(e) => setNomComplet(e.target.value)} required />
+                <input type="text" placeholder="Votre nom et prénom" className="w-full border border-gray-300 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-purple-500 text-sm md:text-base" value={nomComplet} onChange={(e) => setNomComplet(e.target.value)} required />
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Ville / Quartier *</label>
-                <input type="text" placeholder="Votre ville ou quartier" className="w-full border border-gray-300 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-purple-500" value={villeQuartier} onChange={(e) => setVilleQuartier(e.target.value)} required />
+                <input type="text" placeholder="Votre ville ou quartier" className="w-full border border-gray-300 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-purple-500 text-sm md:text-base" value={villeQuartier} onChange={(e) => setVilleQuartier(e.target.value)} required />
               </div>
             </div>
 
             <div className="mb-6">
               <label className="block text-sm font-medium text-gray-700 mb-1">Téléphone (pour confirmation) *</label>
-              <input type="tel" placeholder="+225 XX XX XX XX" className="w-full border border-gray-300 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-purple-500" value={phoneNumber} onChange={(e) => setPhoneNumber(e.target.value)} required />
+              <input type="tel" placeholder="+225 XX XX XX XX" className="w-full border border-gray-300 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-purple-500 text-sm md:text-base" value={phoneNumber} onChange={(e) => setPhoneNumber(e.target.value)} required />
             </div>
 
             <div className="mb-6">
@@ -505,9 +506,9 @@ const LandingPage = ({ onDonate }: { onDonate: (name: string, city: string, amou
               <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
                 {donationTypes.map((type) => (
                   <button key={type.id} onClick={() => setSelectedDonationType(type.id)} className={`p-3 rounded-xl border-2 transition-all ${selectedDonationType === type.id ? "border-purple-600 bg-purple-50" : "border-gray-200 hover:border-purple-300"}`}>
-                    <type.icon className={`w-6 h-6 mx-auto mb-1 ${selectedDonationType === type.id ? "text-purple-600" : "text-gray-500"}`} />
-                    <p className={`text-sm font-medium ${selectedDonationType === type.id ? "text-purple-700" : "text-gray-700"}`}>{type.name}</p>
-                    <p className="text-xs text-gray-500 mt-1">{type.description}</p>
+                    <type.icon className={`w-5 h-5 md:w-6 md:h-6 mx-auto mb-1 ${selectedDonationType === type.id ? "text-purple-600" : "text-gray-500"}`} />
+                    <p className={`text-xs md:text-sm font-medium ${selectedDonationType === type.id ? "text-purple-700" : "text-gray-700"}`}>{type.name}</p>
+                    <p className="text-xs text-gray-500 mt-1 hidden sm:block">{type.description}</p>
                   </button>
                 ))}
               </div>
@@ -515,9 +516,7 @@ const LandingPage = ({ onDonate }: { onDonate: (name: string, city: string, amou
 
             <div className="mb-6">
               <label className="block text-sm font-medium text-gray-700 mb-3">Montant du don *</label>
-              <div>
-                <input type="number" placeholder="Montant en euros" className="w-full border border-gray-300 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-purple-500" value={donationAmount} onChange={(e) => setDonationAmount(e.target.value)} />
-              </div>
+              <input type="number" placeholder="Montant en euros" className="w-full border border-gray-300 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-purple-500 text-sm md:text-base" value={donationAmount} onChange={(e) => setDonationAmount(e.target.value)} />
             </div>
 
             <div className="mb-8">
@@ -525,14 +524,14 @@ const LandingPage = ({ onDonate }: { onDonate: (name: string, city: string, amou
               <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                 {paymentMethods.map((method) => (
                   <button key={method.id} onClick={() => setSelectedPaymentMethod(method.id)} className={`p-3 rounded-xl border-2 transition-all text-center ${selectedPaymentMethod === method.id ? "border-purple-600 bg-purple-50" : "border-gray-200 hover:border-purple-300"}`}>
-                    <method.icon className={`w-6 h-6 mx-auto mb-1 ${selectedPaymentMethod === method.id ? "text-purple-600" : "text-gray-500"}`} />
+                    <method.icon className={`w-5 h-5 md:w-6 md:h-6 mx-auto mb-1 ${selectedPaymentMethod === method.id ? "text-purple-600" : "text-gray-500"}`} />
                     <p className={`text-xs font-medium ${selectedPaymentMethod === method.id ? "text-purple-700" : "text-gray-700"}`}>{method.name}</p>
                   </button>
                 ))}
               </div>
             </div>
 
-            <button onClick={handleDonate} disabled={isProcessing} className={`w-full py-3.5 rounded-xl transition flex items-center justify-center gap-2 shadow-md ${isProcessing ? "bg-gray-400 cursor-not-allowed" : "bg-purple-600 hover:bg-purple-700"} text-white font-medium`}>
+            <button onClick={handleDonate} disabled={isProcessing} className={`w-full py-3 rounded-xl transition flex items-center justify-center gap-2 shadow-md text-sm md:text-base ${isProcessing ? "bg-gray-400 cursor-not-allowed" : "bg-purple-600 hover:bg-purple-700"} text-white font-medium`}>
               {isProcessing ? "Traitement en cours..." : `Donner ${donationAmount || 'un montant'} €`} <Heart size={18} />
             </button>
             <p className="text-xs text-gray-500 text-center mt-4">Votre don est sécurisé. Vous recevrez un reçu par SMS et email.</p>
@@ -540,91 +539,91 @@ const LandingPage = ({ onDonate }: { onDonate: (name: string, city: string, amou
         </div>
       </section>
 
-      {/* Section Devenir partenaire */}
-      <section className="py-20 bg-gray-100">
-        <div className="container mx-auto px-6 text-center">
-          <UserPlus className="w-16 h-16 mx-auto mb-6 text-purple-600" />
-          <h2 className="text-3xl font-bold text-gray-800 mb-4">Devenez partenaire de l'Église</h2>
-          <p className="text-lg text-gray-600 max-w-3xl mx-auto mb-4">
+      {/* Section Devenir partenaire responsive */}
+      <section className="py-16 md:py-20 bg-gray-100">
+        <div className="container mx-auto px-4 md:px-6 text-center">
+          <UserPlus className="w-12 h-12 md:w-16 md:h-16 mx-auto mb-4 md:mb-6 text-purple-600" />
+          <h2 className="text-2xl md:text-3xl font-bold text-gray-800 mb-3 md:mb-4">Devenez partenaire de l'Église</h2>
+          <p className="text-base md:text-lg text-gray-600 max-w-3xl mx-auto mb-3 md:mb-4 px-2">
             « Que chacun donne comme il l'a décidé en son cœur, sans tristesse ni contrainte, 
             car Dieu aime celui qui donne avec joie. » (2 Corinthiens 9:7)
           </p>
-          <p className="text-gray-500 max-w-2xl mx-auto mb-8">
+          <p className="text-sm md:text-base text-gray-500 max-w-2xl mx-auto mb-6 md:mb-8 px-2">
             Les partenaires bénéficient d'un espace personnel pour suivre leurs dons et contribuer 
             durablement à la mission de l'Église.
           </p>
           <Link 
             to="/devenir-partenaire" 
-            className="inline-flex items-center gap-2 bg-purple-600 text-white px-8 py-3 rounded-xl font-semibold hover:bg-purple-700 transition shadow-md"
+            className="inline-flex items-center gap-2 bg-purple-600 text-white px-6 py-2.5 md:px-8 md:py-3 rounded-xl font-semibold hover:bg-purple-700 transition shadow-md text-sm md:text-base"
           >
             Je deviens partenaire <ArrowRight size={18} />
           </Link>
         </div>
       </section>
 
-      {/* Section Contact */}
-      <section id="contact" className="py-20 bg-white">
-        <div className="container mx-auto px-6">
-          <motion.div {...fadeInUp} className="text-center max-w-2xl mx-auto mb-12">
-            <div className="inline-flex items-center gap-2 bg-purple-100 px-4 py-2 rounded-full mb-4">
-              <MessageCircle className="w-4 h-4 text-purple-600" />
-              <span className="text-sm text-purple-600 font-medium">Nous contacter</span>
+      {/* Section Contact responsive */}
+      <section id="contact" className="py-16 md:py-20 bg-white">
+        <div className="container mx-auto px-4 md:px-6">
+          <motion.div {...fadeInUp} className="text-center max-w-2xl mx-auto mb-10 md:mb-12">
+            <div className="inline-flex items-center gap-2 bg-purple-100 px-3 py-1.5 md:px-4 md:py-2 rounded-full mb-4">
+              <MessageCircle className="w-3 h-3 md:w-4 md:h-4 text-purple-600" />
+              <span className="text-xs md:text-sm text-purple-600 font-medium">Nous contacter</span>
             </div>
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-800 mb-4">
+            <h2 className="text-2xl md:text-4xl font-bold text-gray-800 mb-3 md:mb-4">
               Une question ? <span className="text-purple-600">Écrivez-nous</span>
             </h2>
-            <p className="text-gray-600">Notre équipe vous répondra dans les meilleurs délais</p>
+            <p className="text-gray-600 text-sm md:text-base">Notre équipe vous répondra dans les meilleurs délais</p>
           </motion.div>
 
-          <div className="grid lg:grid-cols-2 gap-12 max-w-5xl mx-auto">
+          <div className="grid lg:grid-cols-2 gap-8 md:gap-12 max-w-5xl mx-auto">
             {/* Informations de contact */}
             <motion.div
               initial={{ opacity: 0, x: -30 }}
               whileInView={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.5 }}
               viewport={{ once: true }}
-              className="space-y-8"
+              className="space-y-6 md:space-y-8"
             >
-              <div className="bg-gradient-to-br from-purple-50 to-white p-6 rounded-2xl border border-purple-100">
-                <h3 className="text-xl font-semibold text-gray-800 mb-6">Informations</h3>
-                <div className="space-y-5">
-                  <div className="flex items-start gap-4">
-                    <div className="p-3 bg-purple-100 rounded-xl">
-                      <MapPinIcon className="w-5 h-5 text-purple-600" />
+              <div className="bg-gradient-to-br from-purple-50 to-white p-5 md:p-6 rounded-2xl border border-purple-100">
+                <h3 className="text-lg md:text-xl font-semibold text-gray-800 mb-4 md:mb-6">Informations</h3>
+                <div className="space-y-4 md:space-y-5">
+                  <div className="flex items-start gap-3 md:gap-4">
+                    <div className="p-2 md:p-3 bg-purple-100 rounded-xl">
+                      <MapPinIcon className="w-4 h-4 md:w-5 md:h-5 text-purple-600" />
                     </div>
                     <div>
-                      <h4 className="font-semibold text-gray-800">Adresse</h4>
-                      <p className="text-gray-500">Abidjan, Côte d'Ivoire</p>
-                      <p className="text-gray-400 text-sm mt-1">2 Plateaux, Rue des Églises</p>
+                      <h4 className="font-semibold text-gray-800 text-sm md:text-base">Adresse</h4>
+                      <p className="text-gray-500 text-xs md:text-sm">Abidjan, Côte d'Ivoire</p>
+                      <p className="text-gray-400 text-xs mt-1">2 Plateaux, Rue des Églises</p>
                     </div>
                   </div>
-                  <div className="flex items-start gap-4">
-                    <div className="p-3 bg-purple-100 rounded-xl">
-                      <Phone className="w-5 h-5 text-purple-600" />
+                  <div className="flex items-start gap-3 md:gap-4">
+                    <div className="p-2 md:p-3 bg-purple-100 rounded-xl">
+                      <Phone className="w-4 h-4 md:w-5 md:h-5 text-purple-600" />
                     </div>
                     <div>
-                      <h4 className="font-semibold text-gray-800">Téléphone</h4>
-                      <p className="text-gray-500">+225 07 00 00 00</p>
-                      <p className="text-gray-400 text-sm">Lun-Ven, 8h-18h</p>
+                      <h4 className="font-semibold text-gray-800 text-sm md:text-base">Téléphone</h4>
+                      <p className="text-gray-500 text-xs md:text-sm">+225 07 00 00 00</p>
+                      <p className="text-gray-400 text-xs">Lun-Ven, 8h-18h</p>
                     </div>
                   </div>
-                  <div className="flex items-start gap-4">
-                    <div className="p-3 bg-purple-100 rounded-xl">
-                      <Mail className="w-5 h-5 text-purple-600" />
+                  <div className="flex items-start gap-3 md:gap-4">
+                    <div className="p-2 md:p-3 bg-purple-100 rounded-xl">
+                      <Mail className="w-4 h-4 md:w-5 md:h-5 text-purple-600" />
                     </div>
                     <div>
-                      <h4 className="font-semibold text-gray-800">Email</h4>
-                      <p className="text-gray-500">contact@eglise-catholique.ci</p>
-                      <p className="text-gray-400 text-sm">support@eglise-catholique.ci</p>
+                      <h4 className="font-semibold text-gray-800 text-sm md:text-base">Email</h4>
+                      <p className="text-gray-500 text-xs md:text-sm">contact@eglise-catholique.ci</p>
+                      <p className="text-gray-400 text-xs">support@eglise-catholique.ci</p>
                     </div>
                   </div>
                 </div>
               </div>
 
               {/* Réseaux sociaux */}
-              <div className="bg-gray-50 p-6 rounded-2xl">
-                <h3 className="text-lg font-semibold text-gray-800 mb-4">Suivez-nous</h3>
-                <div className="flex gap-3">
+              <div className="bg-gray-50 p-5 md:p-6 rounded-2xl">
+                <h3 className="text-base md:text-lg font-semibold text-gray-800 mb-3 md:mb-4">Suivez-nous</h3>
+                <div className="flex flex-wrap gap-2 md:gap-3">
                   {[
                     { icon: Facebook, label: "Facebook", color: "hover:bg-blue-600" },
                     { icon: Twitter, label: "Twitter", color: "hover:bg-sky-500" },
@@ -635,9 +634,9 @@ const LandingPage = ({ onDonate }: { onDonate: (name: string, city: string, amou
                     <a
                       key={idx}
                       href="#"
-                      className={`p-3 bg-white rounded-xl shadow-sm hover:shadow-md transition-all duration-300 hover:text-white ${social.color} group`}
+                      className={`p-2 md:p-3 bg-white rounded-xl shadow-sm hover:shadow-md transition-all duration-300 hover:text-white ${social.color} group`}
                     >
-                      <social.icon className="w-5 h-5 text-gray-600 group-hover:text-white transition-colors" />
+                      <social.icon className="w-4 h-4 md:w-5 md:h-5 text-gray-600 group-hover:text-white transition-colors" />
                     </a>
                   ))}
                 </div>
@@ -650,47 +649,47 @@ const LandingPage = ({ onDonate }: { onDonate: (name: string, city: string, amou
               whileInView={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.5, delay: 0.2 }}
               viewport={{ once: true }}
-              className="bg-gray-50 p-8 rounded-2xl"
+              className="bg-gray-50 p-5 md:p-8 rounded-2xl"
             >
-              <form onSubmit={handleContactSubmit} className="space-y-5">
+              <form onSubmit={handleContactSubmit} className="space-y-4 md:space-y-5">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Nom complet</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1 md:mb-2">Nom complet</label>
                   <input
                     type="text"
                     placeholder="Votre nom et prénom"
-                    className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition"
+                    className="w-full px-4 py-2.5 md:py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition text-sm md:text-base"
                     required
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1 md:mb-2">Email</label>
                   <input
                     type="email"
                     placeholder="votre@email.com"
-                    className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition"
+                    className="w-full px-4 py-2.5 md:py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition text-sm md:text-base"
                     required
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Téléphone</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1 md:mb-2">Téléphone</label>
                   <input
                     type="tel"
                     placeholder="+225 XX XX XX XX"
-                    className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition"
+                    className="w-full px-4 py-2.5 md:py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition text-sm md:text-base"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Message</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1 md:mb-2">Message</label>
                   <textarea
                     rows={4}
                     placeholder="Votre message..."
-                    className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition resize-none"
+                    className="w-full px-4 py-2.5 md:py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition resize-none text-sm md:text-base"
                     required
                   ></textarea>
                 </div>
                 <button
                   type="submit"
-                  className="w-full bg-purple-600 text-white py-3 rounded-xl font-semibold hover:bg-purple-700 transition-all duration-300 flex items-center justify-center gap-2 shadow-md hover:shadow-lg"
+                  className="w-full bg-purple-600 text-white py-2.5 md:py-3 rounded-xl font-semibold hover:bg-purple-700 transition-all duration-300 flex items-center justify-center gap-2 shadow-md hover:shadow-lg text-sm md:text-base"
                 >
                   {formSubmitted ? (
                     <>✓ Message envoyé</>
@@ -709,20 +708,20 @@ const LandingPage = ({ onDonate }: { onDonate: (name: string, city: string, amou
         </div>
       </section>
 
-      {/* Footer */}
+      {/* Footer responsive */}
       <footer className="bg-gray-900 text-white">
         <div className="border-b border-gray-800">
-          <div className="container mx-auto px-6 py-12">
+          <div className="container mx-auto px-4 md:px-6 py-8 md:py-12">
             <div className="max-w-3xl mx-auto text-center">
-              <h3 className="text-xl font-semibold mb-2">Restez informé</h3>
-              <p className="text-gray-400 mb-6">Recevez nos actualités et événements par email</p>
+              <h3 className="text-lg md:text-xl font-semibold mb-2">Restez informé</h3>
+              <p className="text-gray-400 text-sm md:text-base mb-4 md:mb-6">Recevez nos actualités et événements par email</p>
               <div className="flex flex-col sm:flex-row gap-3 max-w-md mx-auto">
                 <input
                   type="email"
                   placeholder="Votre adresse email"
-                  className="flex-1 px-4 py-3 bg-gray-800 border border-gray-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 text-white"
+                  className="flex-1 px-4 py-2.5 md:py-3 bg-gray-800 border border-gray-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 text-white text-sm md:text-base"
                 />
-                <button className="px-6 py-3 bg-purple-600 rounded-xl hover:bg-purple-700 transition font-medium">
+                <button className="px-5 py-2.5 md:px-6 md:py-3 bg-purple-600 rounded-xl hover:bg-purple-700 transition font-medium text-sm md:text-base">
                   S'abonner
                 </button>
               </div>
@@ -730,20 +729,20 @@ const LandingPage = ({ onDonate }: { onDonate: (name: string, city: string, amou
           </div>
         </div>
 
-        <div className="container mx-auto px-6 py-12">
-          <div className="grid md:grid-cols-4 gap-8">
-            <div>
-              <div className="flex items-center gap-2 mb-4">
-                <Church className="h-7 w-7 text-purple-400" />
-                <span className="text-lg font-bold">Mon offrande</span>
+        <div className="container mx-auto px-4 md:px-6 py-8 md:py-12">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
+            <div className="text-center sm:text-left">
+              <div className="flex items-center justify-center sm:justify-start gap-2 mb-4">
+                <Church className="h-6 w-6 md:h-7 md:w-7 text-purple-400" />
+                <span className="text-base md:text-lg font-bold">Mon offrande</span>
               </div>
-              <p className="text-gray-400 text-sm leading-relaxed">
+              <p className="text-gray-400 text-xs md:text-sm leading-relaxed">
                 Donnez avec joie, car Dieu aime celui qui donne avec joie. Au service de la communauté depuis plus de 50 ans.
               </p>
             </div>
-            <div>
-              <h4 className="font-semibold mb-4 text-white">Navigation</h4>
-              <ul className="space-y-2 text-gray-400 text-sm">
+            <div className="text-center sm:text-left">
+              <h4 className="font-semibold mb-3 md:mb-4 text-white text-sm md:text-base">Navigation</h4>
+              <ul className="space-y-2 text-gray-400 text-xs md:text-sm">
                 <li><a href="#hero" className="hover:text-purple-400 transition">Accueil</a></li>
                 <li><a href="#about" className="hover:text-purple-400 transition">À propos</a></li>
                 <li><a href="#news" className="hover:text-purple-400 transition">Événements & Actus</a></li>
@@ -751,32 +750,32 @@ const LandingPage = ({ onDonate }: { onDonate: (name: string, city: string, amou
                 <li><a href="#contact" className="hover:text-purple-400 transition">Contact</a></li>
               </ul>
             </div>
-            <div>
-              <h4 className="font-semibold mb-4 text-white">Agir</h4>
-              <ul className="space-y-2 text-gray-400 text-sm">
+            <div className="text-center sm:text-left">
+              <h4 className="font-semibold mb-3 md:mb-4 text-white text-sm md:text-base">Agir</h4>
+              <ul className="space-y-2 text-gray-400 text-xs md:text-sm">
                 <li><button onClick={scrollToDonate} className="hover:text-purple-400 transition">Faire un don</button></li>
                 <li><Link to="/devenir-partenaire" className="hover:text-purple-400 transition">Devenir partenaire</Link></li>
                 <li><a href="#" className="hover:text-purple-400 transition">Devenir bénévole</a></li>
                 <li><a href="#" className="hover:text-purple-400 transition">Prier pour nous</a></li>
               </ul>
             </div>
-            <div>
-              <h4 className="font-semibold mb-4 text-white">Contact</h4>
-              <ul className="space-y-2 text-gray-400 text-sm">
-                <li className="flex items-center gap-2"><MapPinIcon size={14} /> <span>Abidjan, Côte d'Ivoire</span></li>
-                <li className="flex items-center gap-2"><Phone size={14} /> <span>+225 07 00 00 00</span></li>
-                <li className="flex items-center gap-2"><Mail size={14} /> <span>contact@eglise-catholique.ci</span></li>
+            <div className="text-center sm:text-left">
+              <h4 className="font-semibold mb-3 md:mb-4 text-white text-sm md:text-base">Contact</h4>
+              <ul className="space-y-2 text-gray-400 text-xs md:text-sm">
+                <li className="flex items-center justify-center sm:justify-start gap-2"><MapPinIcon size={14} /> <span>Abidjan, Côte d'Ivoire</span></li>
+                <li className="flex items-center justify-center sm:justify-start gap-2"><Phone size={14} /> <span>+225 07 00 00 00</span></li>
+                <li className="flex items-center justify-center sm:justify-start gap-2"><Mail size={14} /> <span>contact@eglise-catholique.ci</span></li>
               </ul>
             </div>
           </div>
-          <div className="border-t border-gray-800 mt-8 pt-6 text-center text-gray-500 text-sm">
+          <div className="border-t border-gray-800 mt-6 md:mt-8 pt-5 md:pt-6 text-center text-gray-500 text-xs md:text-sm">
             <p>&copy; {new Date().getFullYear()} Mon offrande en ligne. Tous droits réservés.</p>
             <p className="mt-1">Conçu avec ❤️ pour la communauté catholique de Côte d'Ivoire</p>
           </div>
         </div>
       </footer>
 
-      {/* Modal */}
+      {/* Modal responsive */}
       <AnimatePresence>
         {selectedItem && (
           <motion.div
@@ -784,7 +783,7 @@ const LandingPage = ({ onDonate }: { onDonate: (name: string, city: string, amou
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={() => setSelectedItem(null)}
-            className="fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-4"
+            className="fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-3 md:p-4"
           >
             <motion.div
               initial={{ scale: 0.9, opacity: 0 }}
@@ -793,28 +792,28 @@ const LandingPage = ({ onDonate }: { onDonate: (name: string, city: string, amou
               onClick={(e) => e.stopPropagation()}
               className="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto"
             >
-              <div className="relative h-64">
+              <div className="relative h-48 md:h-64">
                 <img src={selectedItem.image} alt={selectedItem.title} className="w-full h-full object-cover rounded-t-2xl" />
-                <button onClick={() => setSelectedItem(null)} className="absolute top-4 right-4 p-2 bg-white rounded-full shadow-lg hover:bg-gray-100 transition"><X size={20} /></button>
-                <div className="absolute bottom-4 left-4">
-                  <span className={`px-3 py-1.5 rounded-xl text-sm font-medium ${selectedItem.type === 'event' ? 'bg-purple-600 text-white' : 'bg-emerald-500 text-white'}`}>
-                    {selectedItem.type === 'event' ? ' Événement' : ' Actualité'}
+                <button onClick={() => setSelectedItem(null)} className="absolute top-3 right-3 md:top-4 md:right-4 p-1.5 md:p-2 bg-white rounded-full shadow-lg hover:bg-gray-100 transition"><X size={18} className="md:w-5 md:h-5" /></button>
+                <div className="absolute bottom-3 left-3 md:bottom-4 md:left-4">
+                  <span className={`px-2 py-1 md:px-3 md:py-1.5 rounded-xl text-xs md:text-sm font-medium ${selectedItem.type === 'event' ? 'bg-purple-600 text-white' : 'bg-emerald-500 text-white'}`}>
+                    {selectedItem.type === 'event' ? 'Événement' : 'Actualité'}
                   </span>
                 </div>
               </div>
-              <div className="p-6">
-                <h3 className="text-2xl font-bold text-gray-800 mb-3">{selectedItem.title}</h3>
-                <div className="flex flex-wrap gap-4 mb-4 text-sm text-gray-500">
-                  <div className="flex items-center gap-1"><Calendar size={16} /> <span>{selectedItem.date}</span></div>
-                  {selectedItem.time && <div className="flex items-center gap-1"><Clock3 size={16} /> <span>{selectedItem.time}</span></div>}
-                  <div className="flex items-center gap-1"><MapPin size={16} /> <span>{selectedItem.location}</span></div>
+              <div className="p-4 md:p-6">
+                <h3 className="text-xl md:text-2xl font-bold text-gray-800 mb-2 md:mb-3">{selectedItem.title}</h3>
+                <div className="flex flex-wrap gap-2 md:gap-4 mb-3 md:mb-4 text-xs md:text-sm text-gray-500">
+                  <div className="flex items-center gap-1"><Calendar size={14} className="md:w-4 md:h-4" /> <span>{selectedItem.date}</span></div>
+                  {selectedItem.time && <div className="flex items-center gap-1"><Clock3 size={14} className="md:w-4 md:h-4" /> <span>{selectedItem.time}</span></div>}
+                  <div className="flex items-center gap-1"><MapPin size={14} className="md:w-4 md:h-4" /> <span>{selectedItem.location}</span></div>
                 </div>
-                <p className="text-gray-600 leading-relaxed mb-6">{selectedItem.fullDescription || selectedItem.description}</p>
-                <div className="flex gap-3">
-                  <button onClick={() => { setSelectedItem(null); scrollToDonate(); }} className="flex items-center gap-2 bg-purple-600 text-white px-6 py-2.5 rounded-xl hover:bg-purple-700 transition font-medium">
+                <p className="text-gray-600 leading-relaxed mb-5 md:mb-6 text-sm md:text-base">{selectedItem.fullDescription || selectedItem.description}</p>
+                <div className="flex flex-col sm:flex-row gap-3">
+                  <button onClick={() => { setSelectedItem(null); scrollToDonate(); }} className="flex items-center justify-center gap-2 bg-purple-600 text-white px-5 py-2.5 md:px-6 md:py-2.5 rounded-xl hover:bg-purple-700 transition font-medium text-sm md:text-base">
                     {selectedItem.type === 'event' ? 'Participer' : 'Soutenir'} <ArrowRight size={16} />
                   </button>
-                  <button onClick={() => setSelectedItem(null)} className="px-6 py-2.5 border border-gray-300 rounded-xl hover:bg-gray-50 transition font-medium">Fermer</button>
+                  <button onClick={() => setSelectedItem(null)} className="px-5 py-2.5 md:px-6 md:py-2.5 border border-gray-300 rounded-xl hover:bg-gray-50 transition font-medium text-sm md:text-base">Fermer</button>
                 </div>
               </div>
             </motion.div>
@@ -831,7 +830,7 @@ const ProtectedAdminRoute = () => {
   return isAuthenticated ? <AdminDashboard /> : <Navigate to="/admin-login" replace />;
 };
 
-// Composant principal avec routage (modifié pour éviter l'écran de chargement)
+// Composant principal avec routage
 function App() {
   const [donations, setDonations] = useState<Donation[]>([])
   const [loading, setLoading] = useState(true)
@@ -885,7 +884,7 @@ function App() {
     loadDonations()
   }, [])
 
-  // Mise à jour en arrière‑plan du mode maintenance (sans bloquer l'affichage)
+  // Mise à jour en arrière‑plan du mode maintenance
   useEffect(() => {
     const checkMaintenance = async () => {
       const { data, error } = await supabase
@@ -902,7 +901,6 @@ function App() {
     checkMaintenance();
   }, []);
 
-  // Plus d'écran de chargement : on utilise directement la valeur initiale
   return (
     <Routes>
       <Route path="/" element={maintenanceMode ? <MaintenancePage /> : <LandingPage onDonate={addDonation} />} />
