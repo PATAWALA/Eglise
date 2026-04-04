@@ -57,18 +57,18 @@ const Leaderboard: React.FC<LeaderboardProps> = ({ donations, loading = false })
 
   // Rendu des médailles selon le rang
   const getMedal = (index: number) => {
-    if (index === 0) return <Trophy className="w-5 h-5 text-yellow-500" />;
-    if (index === 1) return <Medal className="w-5 h-5 text-gray-400" />;
-    if (index === 2) return <Medal className="w-5 h-5 text-amber-600" />;
-    return <span className="w-5 h-5 text-gray-400 font-medium">{index + 1}</span>;
+    if (index === 0) return <Trophy className="w-4 h-4 sm:w-5 sm:h-5 text-yellow-500" />;
+    if (index === 1) return <Medal className="w-4 h-4 sm:w-5 sm:h-5 text-gray-400" />;
+    if (index === 2) return <Medal className="w-4 h-4 sm:w-5 sm:h-5 text-amber-600" />;
+    return <span className="w-4 h-4 sm:w-5 sm:h-5 text-gray-400 font-medium text-sm sm:text-base">{index + 1}</span>;
   };
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-purple-50 to-white flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-purple-50 to-white flex items-center justify-center px-4">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Chargement du tableau d'honneur...</p>
+          <div className="animate-spin rounded-full h-10 w-10 sm:h-12 sm:w-12 border-b-2 border-purple-600 mx-auto mb-4"></div>
+          <p className="text-gray-600 text-sm sm:text-base">Chargement du tableau d'honneur...</p>
         </div>
       </div>
     );
@@ -76,41 +76,41 @@ const Leaderboard: React.FC<LeaderboardProps> = ({ donations, loading = false })
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-purple-50">
-      <div className="container mx-auto px-4 sm:px-6 py-12 md:py-20">
+      <div className="container mx-auto px-3 sm:px-6 py-8 sm:py-12 md:py-20">
         {/* Header avec texte inspirant */}
         <motion.div 
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
-          className="text-center mb-12"
+          className="text-center mb-8 sm:mb-12"
         >
-          <div className="inline-flex items-center gap-2 bg-purple-100 px-4 py-2 rounded-full mb-4">
-            <Crown className="w-4 h-4 text-purple-600" />
-            <span className="text-sm text-purple-600 font-medium">Reconnaissance divine</span>
+          <div className="inline-flex items-center gap-2 bg-purple-100 px-3 py-1.5 sm:px-4 sm:py-2 rounded-full mb-3 sm:mb-4">
+            <Crown className="w-3 h-3 sm:w-4 sm:h-4 text-purple-600" />
+            <span className="text-xs sm:text-sm text-purple-600 font-medium">Reconnaissance divine</span>
           </div>
           
-          <h1 className="text-3xl md:text-5xl font-bold text-gray-800 mb-4">
+          <h1 className="text-2xl sm:text-3xl md:text-5xl font-bold text-gray-800 mb-3 sm:mb-4">
             Tableau d'<span className="bg-gradient-to-r from-purple-600 to-purple-400 bg-clip-text text-transparent">Honneur</span>
           </h1>
           
-          <div className="max-w-2xl mx-auto">
-            <p className="text-gray-600 mb-3">
+          <div className="max-w-2xl mx-auto px-2">
+            <p className="text-gray-600 text-sm sm:text-base mb-2 sm:mb-3">
               « Que ta main gauche ne sache pas ce que fait ta main droite, afin que ton aumône soit dans le secret ; 
               et ton Père, qui voit dans le secret, te le rendra. » (Matthieu 6:3-4)
             </p>
-            <p className="text-sm text-gray-500 italic">
+            <p className="text-xs sm:text-sm text-gray-500 italic">
               Ce tableau honore la générosité des cœurs qui soutiennent l'œuvre de Dieu. 
               Que Dieu bénisse abondamment chaque donateur !
             </p>
           </div>
         </motion.div>
 
-        {/* Filtres élégants - sans emojis */}
+        {/* Filtres élégants - responsive wrap */}
         <motion.div 
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.1 }}
-          className="flex flex-wrap justify-center gap-3 mb-10"
+          className="flex flex-wrap justify-center gap-2 sm:gap-3 mb-8 sm:mb-10"
         >
           {[
             { id: "week", label: "Cette semaine", icon: CalendarDays },
@@ -121,14 +121,15 @@ const Leaderboard: React.FC<LeaderboardProps> = ({ donations, loading = false })
             <button
               key={btn.id}
               onClick={() => setFilter(btn.id as typeof filter)}
-              className={`px-5 py-2.5 rounded-xl font-medium transition-all duration-300 flex items-center gap-2 ${
+              className={`px-3 py-1.5 sm:px-5 sm:py-2.5 rounded-xl font-medium transition-all duration-300 flex items-center gap-1.5 sm:gap-2 text-xs sm:text-sm ${
                 filter === btn.id
                   ? "bg-purple-600 text-white shadow-md"
                   : "bg-white text-gray-600 hover:bg-purple-50 border border-gray-200"
               }`}
             >
-              <btn.icon size={18} />
-              {btn.label}
+              <btn.icon size={16} className="sm:w-[18px] sm:h-[18px]" />
+              <span className="hidden xs:inline">{btn.label}</span>
+              <span className="xs:hidden">{btn.label === "Cette semaine" ? "Semaine" : btn.label === "Ce mois" ? "Mois" : btn.label === "Meilleurs dons" ? "Top" : "Tous"}</span>
             </button>
           ))}
         </motion.div>
@@ -138,9 +139,9 @@ const Leaderboard: React.FC<LeaderboardProps> = ({ donations, loading = false })
           <motion.p 
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            className="text-center text-sm text-gray-500 mb-6"
+            className="text-center text-xs sm:text-sm text-gray-500 mb-4 sm:mb-6 px-2"
           >
-            <Heart className="inline w-4 h-4 text-purple-600 mr-1" />
+            <Heart className="inline w-3 h-3 sm:w-4 sm:h-4 text-purple-600 mr-1" />
             {filter === "week" && "Voici les dons reçus cette semaine. Que Dieu bénisse chaque cœur généreux !"}
             {filter === "month" && "Voici les dons reçus ce mois-ci. Merci pour votre fidélité !"}
             {filter === "top" && "Ces généreux donateurs se distinguent par leur soutien exceptionnel. Qu'ils soient bénis !"}
@@ -148,31 +149,31 @@ const Leaderboard: React.FC<LeaderboardProps> = ({ donations, loading = false })
           </motion.p>
         )}
 
-        {/* Tableau */}
+        {/* Tableau responsive avec scroll horizontal */}
         <motion.div 
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.2 }}
-          className="bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-100"
+          className="bg-white rounded-xl sm:rounded-2xl shadow-xl overflow-hidden border border-gray-100"
         >
           <div className="overflow-x-auto">
-            <table className="w-full">
+            <table className="w-full min-w-[500px] sm:min-w-full">
               <thead className="bg-gradient-to-r from-purple-600 to-purple-500">
                 <tr>
-                  <th className="py-4 px-4 text-left text-white font-semibold">Rang</th>
-                  <th className="py-4 px-4 text-left text-white font-semibold">Donateur</th>
-                  <th className="py-4 px-4 text-left text-white font-semibold hidden md:table-cell">Ville / Quartier</th>
-                  <th className="py-4 px-4 text-right text-white font-semibold">Montant</th>
-                  <th className="py-4 px-4 text-left text-white font-semibold hidden lg:table-cell">Date</th>
+                  <th className="py-3 sm:py-4 px-2 sm:px-4 text-left text-white font-semibold text-xs sm:text-sm">Rang</th>
+                  <th className="py-3 sm:py-4 px-2 sm:px-4 text-left text-white font-semibold text-xs sm:text-sm">Donateur</th>
+                  <th className="py-3 sm:py-4 px-2 sm:px-4 text-left text-white font-semibold text-xs sm:text-sm hidden sm:table-cell">Ville / Quartier</th>
+                  <th className="py-3 sm:py-4 px-2 sm:px-4 text-right text-white font-semibold text-xs sm:text-sm">Montant</th>
+                  <th className="py-3 sm:py-4 px-2 sm:px-4 text-left text-white font-semibold text-xs sm:text-sm hidden md:table-cell">Date</th>
                 </tr>
               </thead>
               <tbody>
                 {filteredDonations.length === 0 ? (
                   <tr>
-                    <td colSpan={5} className="text-center py-16">
-                      <HandHeart className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-                      <p className="text-gray-500">Aucun don pour cette période.</p>
-                      <p className="text-sm text-gray-400 mt-1">Soyez le premier à faire un don !</p>
+                    <td colSpan={5} className="text-center py-12 sm:py-16">
+                      <HandHeart className="w-10 h-10 sm:w-12 sm:h-12 text-gray-300 mx-auto mb-3" />
+                      <p className="text-gray-500 text-sm sm:text-base">Aucun don pour cette période.</p>
+                      <p className="text-xs text-gray-400 mt-1">Soyez le premier à faire un don !</p>
                     </td>
                   </tr>
                 ) : (
@@ -184,27 +185,27 @@ const Leaderboard: React.FC<LeaderboardProps> = ({ donations, loading = false })
                       transition={{ delay: idx * 0.03 }}
                       className="border-b border-gray-100 hover:bg-purple-50/30 transition-colors group"
                     >
-                      <td className="py-4 px-4">
-                        <div className="flex items-center gap-2">
+                      <td className="py-3 sm:py-4 px-2 sm:px-4">
+                        <div className="flex items-center gap-1 sm:gap-2">
                           {getMedal(idx)}
                           {idx < 3 && (
-                            <span className="text-xs font-medium text-amber-600 bg-amber-50 px-2 py-0.5 rounded-full">
+                            <span className="text-[10px] sm:text-xs font-medium text-amber-600 bg-amber-50 px-1.5 py-0.5 sm:px-2 sm:py-0.5 rounded-full">
                               Top {idx + 1}
                             </span>
                           )}
                         </div>
                       </td>
-                      <td className="py-4 px-4">
+                      <td className="py-3 sm:py-4 px-2 sm:px-4">
                         <div>
-                          <p className="font-semibold text-gray-800">{don.name}</p>
-                          <p className="text-xs text-gray-400 md:hidden">{don.city}</p>
+                          <p className="font-semibold text-gray-800 text-sm sm:text-base">{don.name}</p>
+                          <p className="text-xs text-gray-400 sm:hidden">{don.city}</p>
                         </div>
                       </td>
-                      <td className="py-4 px-4 hidden md:table-cell text-gray-600">{don.city}</td>
-                      <td className="py-4 px-4 text-right">
-                        <span className="font-bold text-purple-600 text-lg">{don.amount.toLocaleString()} €</span>
+                      <td className="py-3 sm:py-4 px-2 sm:px-4 hidden sm:table-cell text-gray-600 text-sm">{don.city}</td>
+                      <td className="py-3 sm:py-4 px-2 sm:px-4 text-right">
+                        <span className="font-bold text-purple-600 text-base sm:text-lg">{don.amount.toLocaleString()} €</span>
                       </td>
-                      <td className="py-4 px-4 hidden lg:table-cell text-gray-500 text-sm">
+                      <td className="py-3 sm:py-4 px-2 sm:px-4 hidden md:table-cell text-gray-500 text-xs sm:text-sm">
                         {new Date(don.date).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })}
                       </td>
                     </motion.tr>
@@ -221,25 +222,25 @@ const Leaderboard: React.FC<LeaderboardProps> = ({ donations, loading = false })
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.4 }}
-            className="mt-10 text-center"
+            className="mt-8 sm:mt-10 text-center px-2"
           >
-            <div className="inline-flex items-center gap-2 bg-purple-50 px-6 py-3 rounded-full">
-              <Star className="w-4 h-4 text-amber-500 fill-amber-500" />
-              <p className="text-sm text-gray-600">
+            <div className="inline-flex flex-wrap items-center justify-center gap-2 bg-purple-50 px-4 py-2 sm:px-6 sm:py-3 rounded-full">
+              <Star className="w-3 h-3 sm:w-4 sm:h-4 text-amber-500 fill-amber-500" />
+              <p className="text-xs sm:text-sm text-gray-600">
                 « Donnez, et l'on vous donnera : une bonne mesure, tassée, secouée, débordante » (Luc 6:38)
               </p>
-              <Star className="w-4 h-4 text-amber-500 fill-amber-500" />
+              <Star className="w-3 h-3 sm:w-4 sm:h-4 text-amber-500 fill-amber-500" />
             </div>
           </motion.div>
         )}
 
         {/* Bouton retour */}
-        <div className="mt-10 text-center">
+        <div className="mt-8 sm:mt-10 text-center">
           <Link 
             to="/" 
-            className="inline-flex items-center gap-2 text-purple-600 hover:text-purple-700 transition font-medium group"
+            className="inline-flex items-center gap-2 text-purple-600 hover:text-purple-700 transition font-medium text-sm sm:text-base group"
           >
-            <ArrowLeft size={18} className="group-hover:-translate-x-1 transition" />
+            <ArrowLeft size={16} className="sm:w-[18px] sm:h-[18px] group-hover:-translate-x-1 transition" />
             Retour à l'accueil
           </Link>
         </div>
