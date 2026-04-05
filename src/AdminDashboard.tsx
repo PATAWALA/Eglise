@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useRef } from 'react';
+import { useState, useEffect, useMemo, useRef, useLayoutEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
   LayoutDashboard, 
@@ -139,7 +139,7 @@ const AdminDashboard = () => {
   const [showDeleteAllAdminsConfirm, setShowDeleteAllAdminsConfirm] = useState(false);
   const [deleteAllConfirmText, setDeleteAllConfirmText] = useState('');
   
-  // 🔧 CORRECTION : forcer un re-render des graphiques après le chargement
+  // Graphiques : forcer le re-render
   const [chartKey, setChartKey] = useState(0);
   const mainRef = useRef<HTMLDivElement>(null);
   
@@ -158,19 +158,17 @@ const AdminDashboard = () => {
     loadSiteSettings();
   }, []);
 
-  // 🔧 Quand le chargement est terminé, forcer un re-render des graphiques
   useEffect(() => {
     if (!loading) {
-      // Petite temporisation pour laisser le DOM se stabiliser
       const timer = setTimeout(() => {
         setChartKey(prev => prev + 1);
-      }, 150);
+        window.dispatchEvent(new Event('resize'));
+      }, 200);
       return () => clearTimeout(timer);
     }
   }, [loading]);
 
-  // 🔆 Optionnel : observer les changements de taille du conteneur principal
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (!mainRef.current) return;
     const resizeObserver = new ResizeObserver(() => {
       setChartKey(prev => prev + 1);
@@ -617,10 +615,11 @@ const AdminDashboard = () => {
         <Menu size={24} />
       </button>
 
-      {/* MAIN CONTENT */}
-      <main className={`flex-1 min-w-0 transition-all duration-300 ${sidebarCollapsed ? 'md:ml-20' : 'md:ml-64'} ml-0`}>
-        <header className="bg-white shadow-sm sticky top-0 z-20 px-4 sm:px-6 border-b border-gray-100 h-16 sm:h-20 flex items-center">
-          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center w-full gap-2">
+      {/* MAIN CONTENT - Header sticky et bouton Exporter toujours visible */}
+      <main className="flex-1 min-w-0 transition-all duration-300 ml-0 md:ml-64">
+        {/* Header fixe (sticky) */}
+        <div className="sticky top-0 z-20 bg-white shadow-sm border-b border-gray-100">
+          <div className="px-4 sm:px-6 py-3 sm:py-4 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
             <div>
               <h2 className="text-xl sm:text-2xl font-bold text-gray-800">
                 {activePage === 'dashboard' && 'Tableau de bord'}
@@ -633,16 +632,26 @@ const AdminDashboard = () => {
                 <p className="text-xs sm:text-sm text-purple-600 mt-0.5">Affichage {getPeriodLabel()}</p>
               )}
             </div>
-            {activePage === 'dashboard' && donationCount > 0 && (
-              <button type="button" onClick={exportToCSV} className="flex items-center gap-2 bg-purple-600 text-white px-4 py-2 sm:px-5 sm:py-2.5 rounded-xl hover:bg-purple-700 transition-all shadow-sm text-sm">
-                <Download size={16} /> Exporter CSV
+            {activePage === 'dashboard' && (
+              <button
+                type="button"
+                onClick={exportToCSV}
+                disabled={donationCount === 0}
+                className={`flex items-center gap-2 px-4 py-2 sm:px-5 sm:py-2.5 rounded-xl transition-all shadow-sm text-sm ${
+                  donationCount === 0
+                    ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                    : 'bg-purple-600 text-white hover:bg-purple-700'
+                }`}
+              >
+                <Download size={16} />
+                Exporter CSV
               </button>
             )}
           </div>
-        </header>
+        </div>
 
-        <div ref={mainRef} className="p-4 sm:p-6 overflow-y-auto" style={{ height: 'calc(100vh - 64px)' }}>
-          
+        {/* Contenu principal */}
+        <div ref={mainRef} className="p-4 sm:p-6">
           {/* ========== PAGE DASHBOARD ========== */}
           {activePage === 'dashboard' && (
             <>
@@ -672,7 +681,7 @@ const AdminDashboard = () => {
                 <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 sm:p-6"><div className="flex justify-between items-start"><div><p className="text-gray-500 text-xs sm:text-sm mb-1">Montant moyen</p><p className="text-2xl sm:text-3xl font-bold text-purple-700">{Math.round(averageAmount).toLocaleString()} €</p></div><TrendingUp size={28} className="text-purple-200" /></div></div>
               </div>
 
-              {/* Graphiques - avec clé dynamique pour forcer le re-render */}
+              {/* Graphiques */}
               <div className="grid lg:grid-cols-2 gap-6 mb-8">
                 <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 sm:p-6">
                   <h3 className="font-semibold text-gray-800 mb-4">Répartition par type de don</h3>
