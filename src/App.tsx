@@ -1,4 +1,3 @@
-
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Heart,
@@ -139,7 +138,7 @@ const newsAndEvents = [
   }
 ];
 
-// Composant LandingPage ultra responsive
+// Composant LandingPage ultra responsive (corrigé)
 const LandingPage = ({ onDonate }: { onDonate: (name: string, city: string, amount: number, donationType: string, paymentMethod: string, phone: string) => Promise<boolean> }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [donationAmount, setDonationAmount] = useState("");
@@ -236,8 +235,8 @@ const LandingPage = ({ onDonate }: { onDonate: (name: string, city: string, amou
 
   return (
     <>
-      {/* Navbar responsive */}
-      <nav className="fixed top-0 w-full bg-white/95 backdrop-blur-md shadow-md z-50">
+      {/* Navbar corrigée : left-0 right-0 au lieu de w-full */}
+      <nav className="fixed top-0 left-0 right-0 bg-white/95 backdrop-blur-md shadow-md z-50">
         <div className="container mx-auto px-4 md:px-8 py-3 md:py-5">
           <div className="flex justify-between items-center">
             <Link to="/" className="flex items-center gap-2 group">
@@ -288,8 +287,8 @@ const LandingPage = ({ onDonate }: { onDonate: (name: string, city: string, amou
         )}
       </nav>
 
-      {/* Hero Section responsive */}
-      <section id="hero" className="relative pt-24 md:pt-32 pb-16 md:pb-20 min-h-[80vh] md:min-h-screen flex items-center overflow-hidden">
+      {/* Hero Section : suppression de overflow-hidden */}
+      <section id="hero" className="relative pt-24 md:pt-32 pb-16 md:pb-20 min-h-[80vh] md:min-h-screen flex items-center">
         <div className="absolute inset-0">
           <img
             src={heroImages[currentImage]}
@@ -345,7 +344,7 @@ const LandingPage = ({ onDonate }: { onDonate: (name: string, city: string, amou
         </div>
       </section>
 
-      {/* Section À propos responsive */}
+      {/* Section À propos (inchangée) */}
       <section id="about" className="py-16 md:py-20 bg-white">
         <div className="container mx-auto px-4 md:px-6">
           <div className="text-center max-w-2xl mx-auto mb-10 md:mb-12">
@@ -375,7 +374,7 @@ const LandingPage = ({ onDonate }: { onDonate: (name: string, city: string, amou
         </div>
       </section>
 
-      {/* Section Événements & Actualités responsive */}
+      {/* Section Événements & Actualités (inchangée) */}
       <section id="news" className="py-16 md:py-20 bg-gray-50">
         <div className="container mx-auto px-4 md:px-6">
           <motion.div {...fadeInUp} className="text-center max-w-2xl mx-auto mb-10 md:mb-12">
@@ -468,7 +467,7 @@ const LandingPage = ({ onDonate }: { onDonate: (name: string, city: string, amou
         </div>
       </section>
 
-      {/* Donation form responsive */}
+      {/* Donation form (inchangée) */}
       <section id="donate" ref={donateSectionRef} className="py-16 md:py-20 bg-white">
         <div className="container mx-auto px-4 md:px-6">
           <motion.div {...fadeInUp} className="text-center max-w-2xl mx-auto">
@@ -539,7 +538,7 @@ const LandingPage = ({ onDonate }: { onDonate: (name: string, city: string, amou
         </div>
       </section>
 
-      {/* Section Devenir partenaire responsive */}
+      {/* Section Devenir partenaire (inchangée) */}
       <section className="py-16 md:py-20 bg-gray-100">
         <div className="container mx-auto px-4 md:px-6 text-center">
           <UserPlus className="w-12 h-12 md:w-16 md:h-16 mx-auto mb-4 md:mb-6 text-purple-600" />
@@ -561,7 +560,7 @@ const LandingPage = ({ onDonate }: { onDonate: (name: string, city: string, amou
         </div>
       </section>
 
-      {/* Section Contact responsive */}
+      {/* Section Contact (inchangée) */}
       <section id="contact" className="py-16 md:py-20 bg-white">
         <div className="container mx-auto px-4 md:px-6">
           <motion.div {...fadeInUp} className="text-center max-w-2xl mx-auto mb-10 md:mb-12">
@@ -708,7 +707,7 @@ const LandingPage = ({ onDonate }: { onDonate: (name: string, city: string, amou
         </div>
       </section>
 
-      {/* Footer responsive */}
+      {/* Footer (inchangé) */}
       <footer className="bg-gray-900 text-white">
         <div className="border-b border-gray-800">
           <div className="container mx-auto px-4 md:px-6 py-8 md:py-12">
@@ -775,7 +774,7 @@ const LandingPage = ({ onDonate }: { onDonate: (name: string, city: string, amou
         </div>
       </footer>
 
-      {/* Modal responsive */}
+      {/* Modal (inchangée) */}
       <AnimatePresence>
         {selectedItem && (
           <motion.div
@@ -899,6 +898,18 @@ function App() {
       sessionStorage.setItem('maintenance_mode', String(mode));
     };
     checkMaintenance();
+  }, []);
+
+  // 🔧 CORRECTION DU DÉCALAGE AU SCROLL
+  useEffect(() => {
+    // Force la scrollbar verticale pour éviter la variation de largeur
+    document.documentElement.style.overflowY = 'scroll';
+    // Empêche tout débordement horizontal intempestif
+    document.body.classList.add('overflow-x-hidden');
+    return () => {
+      document.documentElement.style.overflowY = '';
+      document.body.classList.remove('overflow-x-hidden');
+    };
   }, []);
 
   return (

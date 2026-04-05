@@ -36,7 +36,6 @@ const AdminPartners = () => {
   const loadData = async () => {
     setLoading(true);
     
-    // Charger les demandes en attente
     const { data: requestsData } = await supabase
       .from('partnership_requests')
       .select('*')
@@ -45,7 +44,6 @@ const AdminPartners = () => {
     
     setRequests(requestsData || []);
 
-    // Charger les partenaires approuvés
     const { data: partnersData } = await supabase
       .from('partners')
       .select('*')
@@ -60,22 +58,19 @@ const AdminPartners = () => {
     const { data: { user } } = await supabase.auth.getUser();
     
     try {
-      // 1. Mettre à jour le statut dans partnership_requests
       await supabase
         .from('partnership_requests')
         .update({ status: 'approved' })
         .eq('id', request.id);
 
-      // 2. Vérifier si le partenaire existe déjà dans partners
       const { data: existingPartner } = await supabase
         .from('partners')
         .select('*')
         .eq('email', request.email)
-        .maybeSingle(); // Utiliser maybeSingle au lieu de single pour éviter l'erreur
+        .maybeSingle();
 
       if (existingPartner) {
-        // Mettre à jour le partenaire existant (changer son statut)
-        const { error: updateError } = await supabase
+        await supabase
           .from('partners')
           .update({ 
             status: 'approved',
@@ -86,11 +81,8 @@ const AdminPartners = () => {
             reviewed_at: new Date().toISOString()
           })
           .eq('id', existingPartner.id);
-
-        if (updateError) throw updateError;
       } else {
-        // Créer un nouveau partenaire
-        const { error: insertError } = await supabase
+        await supabase
           .from('partners')
           .insert({
             id: crypto.randomUUID(),
@@ -103,11 +95,8 @@ const AdminPartners = () => {
             reviewed_at: new Date().toISOString(),
             created_at: new Date().toISOString()
           });
-
-        if (insertError) throw insertError;
       }
 
-      // 3. Recharger les données
       await loadData();
       alert(`✅ Partenaire ${request.name} approuvé avec succès !`);
     } catch (error) {
@@ -125,7 +114,6 @@ const AdminPartners = () => {
         .update({ status: 'rejected' })
         .eq('id', request.id);
 
-      // Mettre à jour le statut dans partners si existe
       await supabase
         .from('partners')
         .update({ status: 'rejected' })
@@ -155,29 +143,34 @@ const AdminPartners = () => {
   };
 
   if (loading) {
-    return <div className="text-center py-8 text-purple-600">Chargement...</div>;
+    return (
+      <div className="flex items-center justify-center py-12">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600"></div>
+        <span className="ml-2 text-purple-600">Chargement...</span>
+      </div>
+    );
   }
 
   return (
-    <div>
-      {/* Onglets */}
-      <div className="flex gap-4 mb-6 border-b">
+    <div className="px-4 sm:px-6 lg:px-8">
+      {/* Onglets responsives */}
+      <div className="flex flex-wrap gap-2 sm:gap-4 mb-6 border-b border-gray-200">
         <button
           onClick={() => setActiveTab('pending')}
-          className={`px-6 py-3 font-medium transition ${
+          className={`px-4 sm:px-6 py-2 sm:py-3 text-sm sm:text-base font-medium transition-all ${
             activeTab === 'pending'
               ? 'text-purple-600 border-b-2 border-purple-600'
-              : 'text-gray-500 hover:text-gray-700'
+              : 'text-gray-500 hover:text-gray-700 hover:border-b-2 hover:border-gray-300'
           }`}
         >
           📋 Demandes en attente ({requests.length})
         </button>
         <button
           onClick={() => setActiveTab('approved')}
-          className={`px-6 py-3 font-medium transition ${
+          className={`px-4 sm:px-6 py-2 sm:py-3 text-sm sm:text-base font-medium transition-all ${
             activeTab === 'approved'
               ? 'text-purple-600 border-b-2 border-purple-600'
-              : 'text-gray-500 hover:text-gray-700'
+              : 'text-gray-500 hover:text-gray-700 hover:border-b-2 hover:border-gray-300'
           }`}
         >
           ✅ Partenaires approuvés ({partners.length})
@@ -190,17 +183,17 @@ const AdminPartners = () => {
           {requests.length === 0 ? (
             <div className="text-center py-12 text-gray-500">
               <UserCheck size={48} className="mx-auto mb-3 text-gray-300" />
-              <p>Aucune demande en attente</p>
+              <p className="text-sm sm:text-base">Aucune demande en attente</p>
             </div>
           ) : (
             <div className="space-y-4">
               {requests.map((req) => (
-                <div key={req.id} className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
-                  <div className="flex justify-between items-start flex-wrap gap-4">
-                    <div className="flex-1">
+                <div key={req.id} className="bg-white rounded-xl shadow-sm p-4 sm:p-6 border border-gray-100 hover:shadow-md transition">
+                  <div className="flex flex-col lg:flex-row justify-between items-start gap-4">
+                    <div className="flex-1 w-full">
                       <h3 className="text-lg font-semibold text-gray-800">{req.name}</h3>
-                      <div className="grid md:grid-cols-2 gap-2 mt-2 text-sm">
-                        <p><span className="text-gray-500">Email:</span> {req.email}</p>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-1 mt-2 text-sm">
+                        <p><span className="text-gray-500">Email:</span> <span className="break-all">{req.email}</span></p>
                         <p><span className="text-gray-500">Téléphone:</span> {req.phone}</p>
                         <p><span className="text-gray-500">Âge:</span> {req.age} ans</p>
                         <p><span className="text-gray-500">Date:</span> {new Date(req.created_at).toLocaleDateString()}</p>
@@ -208,24 +201,24 @@ const AdminPartners = () => {
                       {req.message && (
                         <div className="mt-3 p-3 bg-gray-50 rounded-lg">
                           <p className="text-gray-500 text-sm mb-1">Message:</p>
-                          <p className="text-gray-700">{req.message}</p>
+                          <p className="text-gray-700 text-sm break-words">{req.message}</p>
                         </div>
                       )}
                     </div>
-                    <div className="flex gap-2">
+                    <div className="flex gap-2 flex-shrink-0 self-end lg:self-center">
                       <button
                         onClick={() => approveRequest(req)}
-                        className="flex items-center gap-2 bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 transition"
+                        className="flex items-center gap-1 sm:gap-2 bg-green-500 text-white px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg hover:bg-green-600 transition text-sm"
                       >
-                        <Check size={18} />
-                        Approuver
+                        <Check size={16} />
+                        <span>Approuver</span>
                       </button>
                       <button
                         onClick={() => rejectRequest(req)}
-                        className="flex items-center gap-2 bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition"
+                        className="flex items-center gap-1 sm:gap-2 bg-red-500 text-white px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg hover:bg-red-600 transition text-sm"
                       >
-                        <X size={18} />
-                        Rejeter
+                        <X size={16} />
+                        <span>Rejeter</span>
                       </button>
                     </div>
                   </div>
@@ -242,33 +235,33 @@ const AdminPartners = () => {
           {partners.length === 0 ? (
             <div className="text-center py-12 text-gray-500">
               <UserX size={48} className="mx-auto mb-3 text-gray-300" />
-              <p>Aucun partenaire approuvé</p>
+              <p className="text-sm sm:text-base">Aucun partenaire approuvé</p>
             </div>
           ) : (
-            <div className="overflow-x-auto">
-              <table className="min-w-full bg-white rounded-xl overflow-hidden shadow-sm">
+            <div className="overflow-x-auto rounded-xl shadow-sm">
+              <table className="min-w-[700px] md:min-w-full w-full bg-white rounded-xl">
                 <thead className="bg-gray-50">
                   <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Nom</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Email</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Téléphone</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Âge</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Date</th>
-                    <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase">Action</th>
+                    <th className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Nom</th>
+                    <th className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Email</th>
+                    <th className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Téléphone</th>
+                    <th className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Âge</th>
+                    <th className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Date</th>
+                    <th className="px-4 sm:px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase">Action</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-200">
                   {partners.map((partner) => (
-                    <tr key={partner.id} className="hover:bg-gray-50">
-                      <td className="px-6 py-4 text-sm font-medium text-gray-900">{partner.name}</td>
-                      <td className="px-6 py-4 text-sm text-gray-600">{partner.email}</td>
-                      <td className="px-6 py-4 text-sm text-gray-600">{partner.phone}</td>
-                      <td className="px-6 py-4 text-sm text-gray-600">{partner.age} ans</td>
-                      <td className="px-6 py-4 text-sm text-gray-600">{new Date(partner.created_at).toLocaleDateString()}</td>
-                      <td className="px-6 py-4 text-center">
+                    <tr key={partner.id} className="hover:bg-gray-50 transition">
+                      <td className="px-4 sm:px-6 py-4 text-sm font-medium text-gray-900 whitespace-nowrap">{partner.name}</td>
+                      <td className="px-4 sm:px-6 py-4 text-sm text-gray-600 break-all">{partner.email}</td>
+                      <td className="px-4 sm:px-6 py-4 text-sm text-gray-600 whitespace-nowrap">{partner.phone}</td>
+                      <td className="px-4 sm:px-6 py-4 text-sm text-gray-600 whitespace-nowrap">{partner.age} ans</td>
+                      <td className="px-4 sm:px-6 py-4 text-sm text-gray-600 whitespace-nowrap">{new Date(partner.created_at).toLocaleDateString()}</td>
+                      <td className="px-4 sm:px-6 py-4 text-center">
                         <button
                           onClick={() => removePartner(partner)}
-                          className="text-red-500 hover:text-red-700 transition"
+                          className="text-red-500 hover:text-red-700 transition p-1"
                           title="Retirer"
                         >
                           <UserX size={18} />
