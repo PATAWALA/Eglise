@@ -486,7 +486,7 @@ const AdminDashboard = () => {
       {/* Sidebar desktop */}
       <aside className={`hidden md:block fixed h-screen z-30 bg-white shadow-xl transition-all duration-300 ${sidebarCollapsed ? 'w-20' : 'w-64'}`}>
         <div className={`p-5 border-b flex ${sidebarCollapsed ? 'justify-center' : 'justify-between'} items-center h-20`}>
-          {!sidebarCollapsed && <h1 className="text-xl font-bold text-purple-700">Admin Panel</h1>}
+          {!sidebarCollapsed && <h1 className="text-xl font-bold text-purple-700">Dieu est bon</h1>}
           <button type="button" onClick={() => setSidebarCollapsed(!sidebarCollapsed)} className="p-2 rounded-lg hover:bg-gray-100 transition" aria-label="Réduire/Agrandir">
             {sidebarCollapsed ? <Menu size={20} className="text-gray-500" /> : <X size={20} className="text-gray-500" />}
           </button>
@@ -553,7 +553,7 @@ const AdminDashboard = () => {
       )}
       <aside className={`fixed top-0 left-0 h-full bg-white shadow-xl z-50 transition-transform duration-300 md:hidden ${mobileSidebarOpen ? 'translate-x-0' : '-translate-x-full'} w-64`}>
         <div className="p-5 border-b flex justify-between items-center h-20">
-          <h1 className="text-xl font-bold text-purple-700">Admin Panel</h1>
+          <h1 className="text-xl font-bold text-purple-700">Dieu est bon</h1>
           <button type="button" onClick={() => setMobileSidebarOpen(false)} className="p-2 rounded-lg hover:bg-gray-100 transition">
             <X size={20} className="text-gray-500" />
           </button>
@@ -617,9 +617,9 @@ const AdminDashboard = () => {
 
       {/* MAIN CONTENT - Structure avec flex-col pour header fixe */}
       <main className="flex-1 min-w-0 transition-all duration-300 ml-0 md:ml-64 flex flex-col h-screen overflow-hidden">
-        {/* Header fixe (ne scroll pas) */}
-        <div className="flex-shrink-0 bg-white shadow-sm border-b border-gray-100 z-20">
-          <div className="px-4 sm:px-6 py-3 sm:py-4 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
+        {/* Header fixe - hauteur identique à la sidebar (h-20) */}
+        <div className="flex-shrink-0 bg-white shadow-sm border-b border-gray-100 z-20 h-20">
+          <div className="px-4 sm:px-6 h-full flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
             <div>
               <h2 className="text-xl sm:text-2xl font-bold text-gray-800">
                 {activePage === 'dashboard' && 'Tableau de bord'}
