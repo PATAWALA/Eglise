@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
   LayoutDashboard, 
@@ -139,8 +139,9 @@ const AdminDashboard = () => {
   const [showDeleteAllAdminsConfirm, setShowDeleteAllAdminsConfirm] = useState(false);
   const [deleteAllConfirmText, setDeleteAllConfirmText] = useState('');
   
-  // 🔧 CORRECTION : forcer un re-render après le montage pour que les graphiques aient une largeur
-  const [isReady, setIsReady] = useState(false);
+  // 🔧 CORRECTION : forcer un re-render des graphiques après le chargement
+  const [chartKey, setChartKey] = useState(0);
+  const mainRef = useRef<HTMLDivElement>(null);
   
   const navigate = useNavigate();
 
@@ -155,8 +156,27 @@ const AdminDashboard = () => {
   useEffect(() => {
     loadAllData();
     loadSiteSettings();
-    // Déclencher le re-render après un court délai pour que les conteneurs aient leur taille
-    setTimeout(() => setIsReady(true), 100);
+  }, []);
+
+  // 🔧 Quand le chargement est terminé, forcer un re-render des graphiques
+  useEffect(() => {
+    if (!loading) {
+      // Petite temporisation pour laisser le DOM se stabiliser
+      const timer = setTimeout(() => {
+        setChartKey(prev => prev + 1);
+      }, 150);
+      return () => clearTimeout(timer);
+    }
+  }, [loading]);
+
+  // 🔆 Optionnel : observer les changements de taille du conteneur principal
+  useEffect(() => {
+    if (!mainRef.current) return;
+    const resizeObserver = new ResizeObserver(() => {
+      setChartKey(prev => prev + 1);
+    });
+    resizeObserver.observe(mainRef.current);
+    return () => resizeObserver.disconnect();
   }, []);
 
   const loadAllData = async () => {
@@ -598,7 +618,7 @@ const AdminDashboard = () => {
       </button>
 
       {/* MAIN CONTENT */}
-      <main className={`flex-1 min-h-screen transition-all duration-300 ${sidebarCollapsed ? 'md:ml-20' : 'md:ml-64'} ml-0`}>
+      <main className={`flex-1 min-w-0 transition-all duration-300 ${sidebarCollapsed ? 'md:ml-20' : 'md:ml-64'} ml-0`}>
         <header className="bg-white shadow-sm sticky top-0 z-20 px-4 sm:px-6 border-b border-gray-100 h-16 sm:h-20 flex items-center">
           <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center w-full gap-2">
             <div>
@@ -621,7 +641,7 @@ const AdminDashboard = () => {
           </div>
         </header>
 
-        <div className="p-4 sm:p-6 overflow-y-auto" style={{ height: 'calc(100vh - 64px)' }}>
+        <div ref={mainRef} className="p-4 sm:p-6 overflow-y-auto" style={{ height: 'calc(100vh - 64px)' }}>
           
           {/* ========== PAGE DASHBOARD ========== */}
           {activePage === 'dashboard' && (
@@ -652,14 +672,14 @@ const AdminDashboard = () => {
                 <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 sm:p-6"><div className="flex justify-between items-start"><div><p className="text-gray-500 text-xs sm:text-sm mb-1">Montant moyen</p><p className="text-2xl sm:text-3xl font-bold text-purple-700">{Math.round(averageAmount).toLocaleString()} €</p></div><TrendingUp size={28} className="text-purple-200" /></div></div>
               </div>
 
-              {/* Graphiques - avec condition isReady */}
+              {/* Graphiques - avec clé dynamique pour forcer le re-render */}
               <div className="grid lg:grid-cols-2 gap-6 mb-8">
                 <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 sm:p-6">
                   <h3 className="font-semibold text-gray-800 mb-4">Répartition par type de don</h3>
                   {donationCount === 0 ? (
                     <div className="h-64 flex items-center justify-center text-gray-400">Aucune donnée</div>
-                  ) : isReady ? (
-                    <ResponsiveContainer width="100%" height={300}>
+                  ) : (
+                    <ResponsiveContainer key={`pie-${chartKey}`} width="100%" height={300}>
                       <PieChart>
                         <Pie data={donationTypesData.filter(d => d.value > 0)} cx="50%" cy="50%" labelLine={false} label={({ name, percent }) => percent ? `${name} ${(percent * 100).toFixed(0)}%` : name} outerRadius={100} dataKey="value">
                           {donationTypesData.filter(d => d.value > 0).map((_, i) => <Cell key={i} fill={COLORS[i % COLORS.length]} />)}
@@ -667,16 +687,14 @@ const AdminDashboard = () => {
                         <Tooltip formatter={(value) => [`${value} €`, 'Montant']} contentStyle={{ borderRadius: '12px', border: '1px solid #e5e7eb' }} />
                       </PieChart>
                     </ResponsiveContainer>
-                  ) : (
-                    <div className="h-64 flex items-center justify-center text-gray-400">Chargement du graphique...</div>
                   )}
                 </div>
                 <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 sm:p-6">
                   <h3 className="font-semibold text-gray-800 mb-4">Répartition par moyen de paiement</h3>
                   {donationCount === 0 ? (
                     <div className="h-64 flex items-center justify-center text-gray-400">Aucune donnée</div>
-                  ) : isReady ? (
-                    <ResponsiveContainer width="100%" height={300}>
+                  ) : (
+                    <ResponsiveContainer key={`bar-${chartKey}`} width="100%" height={300}>
                       <BarChart data={paymentMethodsData.filter(d => d.value > 0)}>
                         <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
                         <XAxis dataKey="name" stroke="#6b7280" tick={{ fontSize: 12 }} />
@@ -686,8 +704,6 @@ const AdminDashboard = () => {
                         <Bar dataKey="value" fill="#8b5cf6" name="Nombre de dons" radius={[8, 8, 0, 0]} />
                       </BarChart>
                     </ResponsiveContainer>
-                  ) : (
-                    <div className="h-64 flex items-center justify-center text-gray-400">Chargement du graphique...</div>
                   )}
                 </div>
               </div>
@@ -695,19 +711,15 @@ const AdminDashboard = () => {
               {/* Évolution */}
               <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 sm:p-6 mb-8">
                 <h3 className="font-semibold text-gray-800 mb-4">Évolution des dons (7 derniers jours)</h3>
-                {isReady ? (
-                  <ResponsiveContainer width="100%" height={300}>
-                    <LineChart data={evolutionData}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-                      <XAxis dataKey="day" stroke="#6b7280" tick={{ fontSize: 12 }} />
-                      <YAxis stroke="#6b7280" tick={{ fontSize: 12 }} />
-                      <Tooltip formatter={(value) => [`${value} €`, 'Montant']} contentStyle={{ borderRadius: '12px', border: '1px solid #e5e7eb' }} />
-                      <Line type="monotone" dataKey="amount" stroke="#8b5cf6" strokeWidth={2} dot={{ fill: '#8b5cf6', strokeWidth: 2 }} />
-                    </LineChart>
-                  </ResponsiveContainer>
-                ) : (
-                  <div className="h-64 flex items-center justify-center text-gray-400">Chargement du graphique...</div>
-                )}
+                <ResponsiveContainer key={`line-${chartKey}`} width="100%" height={300}>
+                  <LineChart data={evolutionData}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+                    <XAxis dataKey="day" stroke="#6b7280" tick={{ fontSize: 12 }} />
+                    <YAxis stroke="#6b7280" tick={{ fontSize: 12 }} />
+                    <Tooltip formatter={(value) => [`${value} €`, 'Montant']} contentStyle={{ borderRadius: '12px', border: '1px solid #e5e7eb' }} />
+                    <Line type="monotone" dataKey="amount" stroke="#8b5cf6" strokeWidth={2} dot={{ fill: '#8b5cf6', strokeWidth: 2 }} />
+                  </LineChart>
+                </ResponsiveContainer>
               </div>
 
               {/* Top donateurs */}
