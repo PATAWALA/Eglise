@@ -139,6 +139,9 @@ const AdminDashboard = () => {
   const [showDeleteAllAdminsConfirm, setShowDeleteAllAdminsConfirm] = useState(false);
   const [deleteAllConfirmText, setDeleteAllConfirmText] = useState('');
   
+  // 🔧 CORRECTION : forcer un re-render après le montage pour que les graphiques aient une largeur
+  const [isReady, setIsReady] = useState(false);
+  
   const navigate = useNavigate();
 
   // ========== CHARGEMENT ==========
@@ -152,6 +155,8 @@ const AdminDashboard = () => {
   useEffect(() => {
     loadAllData();
     loadSiteSettings();
+    // Déclencher le re-render après un court délai pour que les conteneurs aient leur taille
+    setTimeout(() => setIsReady(true), 100);
   }, []);
 
   const loadAllData = async () => {
@@ -647,14 +652,63 @@ const AdminDashboard = () => {
                 <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 sm:p-6"><div className="flex justify-between items-start"><div><p className="text-gray-500 text-xs sm:text-sm mb-1">Montant moyen</p><p className="text-2xl sm:text-3xl font-bold text-purple-700">{Math.round(averageAmount).toLocaleString()} €</p></div><TrendingUp size={28} className="text-purple-200" /></div></div>
               </div>
 
-              {/* Graphiques */}
+              {/* Graphiques - avec condition isReady */}
               <div className="grid lg:grid-cols-2 gap-6 mb-8">
-                <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 sm:p-6"><h3 className="font-semibold text-gray-800 mb-4">Répartition par type de don</h3>{donationCount === 0 ? <div className="h-64 flex items-center justify-center text-gray-400">Aucune donnée</div> : <ResponsiveContainer width="100%" height={300}><PieChart><Pie data={donationTypesData.filter(d => d.value > 0)} cx="50%" cy="50%" labelLine={false} label={({ name, percent }) => percent ? `${name} ${(percent * 100).toFixed(0)}%` : name} outerRadius={100} dataKey="value">{donationTypesData.filter(d => d.value > 0).map((_, i) => <Cell key={i} fill={COLORS[i % COLORS.length]} />)}</Pie><Tooltip formatter={(value) => [`${value} €`, 'Montant']} contentStyle={{ borderRadius: '12px', border: '1px solid #e5e7eb' }} /></PieChart></ResponsiveContainer>}</div>
-                <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 sm:p-6"><h3 className="font-semibold text-gray-800 mb-4">Répartition par moyen de paiement</h3>{donationCount === 0 ? <div className="h-64 flex items-center justify-center text-gray-400">Aucune donnée</div> : <ResponsiveContainer width="100%" height={300}><BarChart data={paymentMethodsData.filter(d => d.value > 0)}><CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" /><XAxis dataKey="name" stroke="#6b7280" tick={{ fontSize: 12 }} /><YAxis stroke="#6b7280" tick={{ fontSize: 12 }} /><Tooltip contentStyle={{ borderRadius: '12px', border: '1px solid #e5e7eb' }} /><Legend /><Bar dataKey="value" fill="#8b5cf6" name="Nombre de dons" radius={[8, 8, 0, 0]} /></BarChart></ResponsiveContainer>}</div>
+                <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 sm:p-6">
+                  <h3 className="font-semibold text-gray-800 mb-4">Répartition par type de don</h3>
+                  {donationCount === 0 ? (
+                    <div className="h-64 flex items-center justify-center text-gray-400">Aucune donnée</div>
+                  ) : isReady ? (
+                    <ResponsiveContainer width="100%" height={300}>
+                      <PieChart>
+                        <Pie data={donationTypesData.filter(d => d.value > 0)} cx="50%" cy="50%" labelLine={false} label={({ name, percent }) => percent ? `${name} ${(percent * 100).toFixed(0)}%` : name} outerRadius={100} dataKey="value">
+                          {donationTypesData.filter(d => d.value > 0).map((_, i) => <Cell key={i} fill={COLORS[i % COLORS.length]} />)}
+                        </Pie>
+                        <Tooltip formatter={(value) => [`${value} €`, 'Montant']} contentStyle={{ borderRadius: '12px', border: '1px solid #e5e7eb' }} />
+                      </PieChart>
+                    </ResponsiveContainer>
+                  ) : (
+                    <div className="h-64 flex items-center justify-center text-gray-400">Chargement du graphique...</div>
+                  )}
+                </div>
+                <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 sm:p-6">
+                  <h3 className="font-semibold text-gray-800 mb-4">Répartition par moyen de paiement</h3>
+                  {donationCount === 0 ? (
+                    <div className="h-64 flex items-center justify-center text-gray-400">Aucune donnée</div>
+                  ) : isReady ? (
+                    <ResponsiveContainer width="100%" height={300}>
+                      <BarChart data={paymentMethodsData.filter(d => d.value > 0)}>
+                        <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+                        <XAxis dataKey="name" stroke="#6b7280" tick={{ fontSize: 12 }} />
+                        <YAxis stroke="#6b7280" tick={{ fontSize: 12 }} />
+                        <Tooltip contentStyle={{ borderRadius: '12px', border: '1px solid #e5e7eb' }} />
+                        <Legend />
+                        <Bar dataKey="value" fill="#8b5cf6" name="Nombre de dons" radius={[8, 8, 0, 0]} />
+                      </BarChart>
+                    </ResponsiveContainer>
+                  ) : (
+                    <div className="h-64 flex items-center justify-center text-gray-400">Chargement du graphique...</div>
+                  )}
+                </div>
               </div>
 
               {/* Évolution */}
-              <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 sm:p-6 mb-8"><h3 className="font-semibold text-gray-800 mb-4">Évolution des dons (7 derniers jours)</h3><ResponsiveContainer width="100%" height={300}><LineChart data={evolutionData}><CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" /><XAxis dataKey="day" stroke="#6b7280" tick={{ fontSize: 12 }} /><YAxis stroke="#6b7280" tick={{ fontSize: 12 }} /><Tooltip formatter={(value) => [`${value} €`, 'Montant']} contentStyle={{ borderRadius: '12px', border: '1px solid #e5e7eb' }} /><Line type="monotone" dataKey="amount" stroke="#8b5cf6" strokeWidth={2} dot={{ fill: '#8b5cf6', strokeWidth: 2 }} /></LineChart></ResponsiveContainer></div>
+              <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 sm:p-6 mb-8">
+                <h3 className="font-semibold text-gray-800 mb-4">Évolution des dons (7 derniers jours)</h3>
+                {isReady ? (
+                  <ResponsiveContainer width="100%" height={300}>
+                    <LineChart data={evolutionData}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+                      <XAxis dataKey="day" stroke="#6b7280" tick={{ fontSize: 12 }} />
+                      <YAxis stroke="#6b7280" tick={{ fontSize: 12 }} />
+                      <Tooltip formatter={(value) => [`${value} €`, 'Montant']} contentStyle={{ borderRadius: '12px', border: '1px solid #e5e7eb' }} />
+                      <Line type="monotone" dataKey="amount" stroke="#8b5cf6" strokeWidth={2} dot={{ fill: '#8b5cf6', strokeWidth: 2 }} />
+                    </LineChart>
+                  </ResponsiveContainer>
+                ) : (
+                  <div className="h-64 flex items-center justify-center text-gray-400">Chargement du graphique...</div>
+                )}
+              </div>
 
               {/* Top donateurs */}
               {topDonorsList.length > 0 && (
@@ -688,7 +742,42 @@ const AdminDashboard = () => {
               )}
 
               {/* Liste des dons */}
-              <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 sm:p-6"><h3 className="font-semibold text-gray-800 mb-4">Liste des dons ({donationCount})</h3>{donationCount === 0 ? <div className="text-center py-12 text-gray-500">Aucun don pour la période sélectionnée</div> : <div className="overflow-x-auto"><table className="w-full min-w-[800px]"><thead className="border-b border-gray-100"><tr><th className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Date</th><th className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Nom</th><th className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Ville</th><th className="px-4 sm:px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Montant</th><th className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Type</th><th className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Paiement</th><th className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Téléphone</th></tr></thead><tbody className="divide-y divide-gray-50">{filteredDonations.slice(0, 50).map((don) => (<tr key={don.id} className="hover:bg-gray-50 transition"><td className="px-4 sm:px-6 py-4 text-sm text-gray-500">{format(new Date(don.date), 'dd/MM/yyyy HH:mm')}</td><td className="px-4 sm:px-6 py-4 text-sm font-medium text-gray-900">{don.name}</td><td className="px-4 sm:px-6 py-4 text-sm text-gray-500">{don.city}</td><td className="px-4 sm:px-6 py-4 text-sm font-bold text-purple-600 text-right">{don.amount} €</td><td className="px-4 sm:px-6 py-4 text-sm"><span className="px-2 py-1 bg-purple-100 text-purple-700 rounded-full text-xs">{don.donation_type}</span></td><td className="px-4 sm:px-6 py-4 text-sm text-gray-500">{don.payment_method}</td><td className="px-4 sm:px-6 py-4 text-sm text-gray-500">{don.phone}</td></tr>))}</tbody></table>{filteredDonations.length > 50 && <p className="text-center text-gray-500 text-sm mt-4">Affichage des 50 premiers dons</p>}</div>}</div>
+              <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 sm:p-6">
+                <h3 className="font-semibold text-gray-800 mb-4">Liste des dons ({donationCount})</h3>
+                {donationCount === 0 ? (
+                  <div className="text-center py-12 text-gray-500">Aucun don pour la période sélectionnée</div>
+                ) : (
+                  <div className="overflow-x-auto">
+                    <table className="w-full min-w-[800px]">
+                      <thead className="border-b border-gray-100">
+                        <tr>
+                          <th className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Date</th>
+                          <th className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Nom</th>
+                          <th className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Ville</th>
+                          <th className="px-4 sm:px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Montant</th>
+                          <th className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Type</th>
+                          <th className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Paiement</th>
+                          <th className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Téléphone</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-gray-50">
+                        {filteredDonations.slice(0, 50).map((don) => (
+                          <tr key={don.id} className="hover:bg-gray-50 transition">
+                            <td className="px-4 sm:px-6 py-4 text-sm text-gray-500">{format(new Date(don.date), 'dd/MM/yyyy HH:mm')}</td>
+                            <td className="px-4 sm:px-6 py-4 text-sm font-medium text-gray-900">{don.name}</td>
+                            <td className="px-4 sm:px-6 py-4 text-sm text-gray-500">{don.city}</td>
+                            <td className="px-4 sm:px-6 py-4 text-sm font-bold text-purple-600 text-right">{don.amount} €</td>
+                            <td className="px-4 sm:px-6 py-4 text-sm"><span className="px-2 py-1 bg-purple-100 text-purple-700 rounded-full text-xs">{don.donation_type}</span></td>
+                            <td className="px-4 sm:px-6 py-4 text-sm text-gray-500">{don.payment_method}</td>
+                            <td className="px-4 sm:px-6 py-4 text-sm text-gray-500">{don.phone}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                    {filteredDonations.length > 50 && <p className="text-center text-gray-500 text-sm mt-4">Affichage des 50 premiers dons</p>}
+                  </div>
+                )}
+              </div>
             </>
           )}
 
