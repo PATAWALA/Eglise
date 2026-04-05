@@ -141,7 +141,7 @@ const AdminDashboard = () => {
   
   // Graphiques : forcer le re-render
   const [chartKey, setChartKey] = useState(0);
-  const mainRef = useRef<HTMLDivElement>(null);
+  const contentRef = useRef<HTMLDivElement>(null);
   
   const navigate = useNavigate();
 
@@ -169,11 +169,11 @@ const AdminDashboard = () => {
   }, [loading]);
 
   useLayoutEffect(() => {
-    if (!mainRef.current) return;
+    if (!contentRef.current) return;
     const resizeObserver = new ResizeObserver(() => {
       setChartKey(prev => prev + 1);
     });
-    resizeObserver.observe(mainRef.current);
+    resizeObserver.observe(contentRef.current);
     return () => resizeObserver.disconnect();
   }, []);
 
@@ -615,10 +615,10 @@ const AdminDashboard = () => {
         <Menu size={24} />
       </button>
 
-      {/* MAIN CONTENT - Header sticky et bouton Exporter toujours visible */}
-      <main className="flex-1 min-w-0 transition-all duration-300 ml-0 md:ml-64">
-        {/* Header fixe (sticky) */}
-        <div className="sticky top-0 z-20 bg-white shadow-sm border-b border-gray-100">
+      {/* MAIN CONTENT - Structure avec flex-col pour header fixe */}
+      <main className="flex-1 min-w-0 transition-all duration-300 ml-0 md:ml-64 flex flex-col h-screen overflow-hidden">
+        {/* Header fixe (ne scroll pas) */}
+        <div className="flex-shrink-0 bg-white shadow-sm border-b border-gray-100 z-20">
           <div className="px-4 sm:px-6 py-3 sm:py-4 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
             <div>
               <h2 className="text-xl sm:text-2xl font-bold text-gray-800">
@@ -650,8 +650,8 @@ const AdminDashboard = () => {
           </div>
         </div>
 
-        {/* Contenu principal */}
-        <div ref={mainRef} className="p-4 sm:p-6">
+        {/* Contenu scrollable */}
+        <div ref={contentRef} className="flex-1 overflow-y-auto p-4 sm:p-6">
           {/* ========== PAGE DASHBOARD ========== */}
           {activePage === 'dashboard' && (
             <>
