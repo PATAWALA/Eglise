@@ -105,6 +105,7 @@ const menuItems = [
 const AdminDashboard = () => {
   // ========== ETATS GENERAUX ==========
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   const [activePage, setActivePage] = useState<'dashboard' | 'partners' | 'requests' | 'admins' | 'settings'>('dashboard');
   const [loading, setLoading] = useState(true);
   const [donations, setDonations] = useState<Donation[]>([]);
@@ -447,10 +448,10 @@ const AdminDashboard = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
         <div className="text-center">
-          <div className="w-12 h-12 border-4 border-purple-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-gray-600">Chargement...</p>
+          <div className="w-10 h-10 sm:w-12 sm:h-12 border-4 border-purple-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-gray-600 text-sm sm:text-base">Chargement...</p>
         </div>
       </div>
     );
@@ -459,8 +460,8 @@ const AdminDashboard = () => {
   // ========== RENDU PRINCIPAL ==========
   return (
     <div className="min-h-screen bg-gray-50 flex">
-      {/* SIDEBAR */}
-      <aside className={`fixed h-screen z-30 bg-white shadow-xl transition-all duration-300 ${sidebarCollapsed ? 'w-20' : 'w-64'}`}>
+      {/* Sidebar desktop */}
+      <aside className={`hidden md:block fixed h-screen z-30 bg-white shadow-xl transition-all duration-300 ${sidebarCollapsed ? 'w-20' : 'w-64'}`}>
         <div className={`p-5 border-b flex ${sidebarCollapsed ? 'justify-center' : 'justify-between'} items-center h-20`}>
           {!sidebarCollapsed && <h1 className="text-xl font-bold text-purple-700">Admin Panel</h1>}
           <button type="button" onClick={() => setSidebarCollapsed(!sidebarCollapsed)} className="p-2 rounded-lg hover:bg-gray-100 transition" aria-label="Réduire/Agrandir">
@@ -523,12 +524,80 @@ const AdminDashboard = () => {
         </div>
       </aside>
 
+      {/* Sidebar mobile (overlay) */}
+      {mobileSidebarOpen && (
+        <div className="fixed inset-0 bg-black/50 z-40 md:hidden" onClick={() => setMobileSidebarOpen(false)} />
+      )}
+      <aside className={`fixed top-0 left-0 h-full bg-white shadow-xl z-50 transition-transform duration-300 md:hidden ${mobileSidebarOpen ? 'translate-x-0' : '-translate-x-full'} w-64`}>
+        <div className="p-5 border-b flex justify-between items-center h-20">
+          <h1 className="text-xl font-bold text-purple-700">Admin Panel</h1>
+          <button type="button" onClick={() => setMobileSidebarOpen(false)} className="p-2 rounded-lg hover:bg-gray-100 transition">
+            <X size={20} className="text-gray-500" />
+          </button>
+        </div>
+        <nav className="p-3 space-y-1 overflow-y-auto h-[calc(100vh-5rem)]">
+          {menuItems.map((item) => {
+            let badgeCount = 0;
+            if (item.id === 'requests') badgeCount = pendingRequests;
+            if (item.id === 'partners') badgeCount = partners.length;
+            if (item.id === 'admins') badgeCount = admins.length;
+            if (item.id === 'settings' && siteSettings?.maintenance_mode) badgeCount = 1;
+            
+            return (
+              <button
+                type="button"
+                key={item.id}
+                onClick={() => { setActivePage(item.id as any); setMobileSidebarOpen(false); }}
+                className={`relative w-full flex items-center gap-3 px-3 py-3 rounded-xl transition-all duration-200 ${
+                  activePage === item.id ? 'bg-gray-100' : 'text-gray-600 hover:bg-gray-50'
+                }`}
+                aria-label={item.label}
+              >
+                <div 
+                  className="p-1.5 rounded-lg transition-all"
+                  style={{ 
+                    backgroundColor: activePage === item.id ? item.color : item.bgColor,
+                    color: activePage === item.id ? 'white' : item.color
+                  }}
+                >
+                  <item.icon size={18} />
+                </div>
+                <span className={`flex-1 text-left text-sm font-medium ${activePage === item.id ? 'text-gray-900' : 'text-gray-600'}`}>
+                  {item.label}
+                </span>
+                {badgeCount > 0 && (
+                  <span className="bg-red-100 text-red-600 text-xs font-semibold px-2 py-0.5 rounded-full min-w-[20px] text-center">
+                    {badgeCount > 99 ? '99+' : badgeCount}
+                  </span>
+                )}
+              </button>
+            );
+          })}
+        </nav>
+        <div className="absolute bottom-0 w-full p-3 border-t bg-white">
+          <button type="button" onClick={handleLogout} className="w-full flex items-center gap-3 px-3 py-3 rounded-xl text-gray-600 hover:bg-red-50 hover:text-red-600 transition-all">
+            <LogOut size={20} />
+            <span className="text-sm font-medium">Déconnexion</span>
+          </button>
+        </div>
+      </aside>
+
+      {/* Bouton hamburger mobile */}
+      <button
+        type="button"
+        onClick={() => setMobileSidebarOpen(true)}
+        className="fixed bottom-4 right-4 z-30 md:hidden bg-purple-600 text-white p-3 rounded-full shadow-lg hover:bg-purple-700 transition"
+        aria-label="Ouvrir le menu"
+      >
+        <Menu size={24} />
+      </button>
+
       {/* MAIN CONTENT */}
-      <main className={`flex-1 min-h-screen transition-all duration-300 ${sidebarCollapsed ? 'ml-20' : 'ml-64'}`}>
-        <header className="bg-white shadow-sm sticky top-0 z-20 px-6 border-b border-gray-100 h-20 flex items-center">
-          <div className="flex justify-between items-center w-full">
+      <main className={`flex-1 min-h-screen transition-all duration-300 ${sidebarCollapsed ? 'md:ml-20' : 'md:ml-64'} ml-0`}>
+        <header className="bg-white shadow-sm sticky top-0 z-20 px-4 sm:px-6 border-b border-gray-100 h-16 sm:h-20 flex items-center">
+          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center w-full gap-2">
             <div>
-              <h2 className="text-2xl font-bold text-gray-800">
+              <h2 className="text-xl sm:text-2xl font-bold text-gray-800">
                 {activePage === 'dashboard' && 'Tableau de bord'}
                 {activePage === 'requests' && 'Demandes de partenariat'}
                 {activePage === 'partners' && 'Partenaires'}
@@ -536,80 +605,80 @@ const AdminDashboard = () => {
                 {activePage === 'settings' && 'Paramètres avancés'}
               </h2>
               {activePage === 'dashboard' && (
-                <p className="text-sm text-purple-600 mt-1">Affichage {getPeriodLabel()}</p>
+                <p className="text-xs sm:text-sm text-purple-600 mt-0.5">Affichage {getPeriodLabel()}</p>
               )}
             </div>
             {activePage === 'dashboard' && donationCount > 0 && (
-              <button type="button" onClick={exportToCSV} className="flex items-center gap-2 bg-purple-600 text-white px-5 py-2.5 rounded-xl hover:bg-purple-700 transition-all shadow-sm" aria-label="Exporter CSV">
-                <Download size={18} /> Exporter CSV
+              <button type="button" onClick={exportToCSV} className="flex items-center gap-2 bg-purple-600 text-white px-4 py-2 sm:px-5 sm:py-2.5 rounded-xl hover:bg-purple-700 transition-all shadow-sm text-sm">
+                <Download size={16} /> Exporter CSV
               </button>
             )}
           </div>
         </header>
 
-        <div className="p-6 overflow-y-auto" style={{ height: 'calc(100vh - 80px)' }}>
+        <div className="p-4 sm:p-6 overflow-y-auto" style={{ height: 'calc(100vh - 64px)' }}>
           
           {/* ========== PAGE DASHBOARD ========== */}
           {activePage === 'dashboard' && (
             <>
               {/* Filtres période */}
-              <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 mb-6">
-                <div className="flex flex-wrap gap-3">
-                  <button type="button" onClick={() => setFilterPeriod('all')} className={`px-5 py-2.5 rounded-xl transition-all font-medium flex items-center gap-2 ${filterPeriod === 'all' ? 'bg-purple-600 text-white shadow-sm' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}><LayoutDashboard size={16} /> Tous</button>
-                  <button type="button" onClick={() => setFilterPeriod('today')} className={`px-5 py-2.5 rounded-xl transition-all font-medium flex items-center gap-2 ${filterPeriod === 'today' ? 'bg-purple-600 text-white shadow-sm' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}><Calendar size={16} /> Aujourd'hui</button>
-                  <button type="button" onClick={() => setFilterPeriod('week')} className={`px-5 py-2.5 rounded-xl transition-all font-medium flex items-center gap-2 ${filterPeriod === 'week' ? 'bg-purple-600 text-white shadow-sm' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}><Clock size={16} /> 7 derniers jours</button>
-                  <button type="button" onClick={() => setFilterPeriod('month')} className={`px-5 py-2.5 rounded-xl transition-all font-medium flex items-center gap-2 ${filterPeriod === 'month' ? 'bg-purple-600 text-white shadow-sm' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}><Calendar size={16} /> 30 derniers jours</button>
-                  <button type="button" onClick={() => setShowFilters(!showFilters)} className={`px-5 py-2.5 rounded-xl transition-all font-medium flex items-center gap-2 ${showFilters ? 'bg-purple-100 text-purple-700' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}><Filter size={16} /> Filtres avancés <ChevronDown size={14} className={`transition-transform duration-300 ${showFilters ? 'rotate-180' : ''}`} /></button>
+              <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 sm:p-5 mb-6">
+                <div className="flex flex-wrap gap-2 sm:gap-3">
+                  <button type="button" onClick={() => setFilterPeriod('all')} className={`px-3 py-1.5 sm:px-5 sm:py-2.5 rounded-xl transition-all font-medium text-sm flex items-center gap-2 ${filterPeriod === 'all' ? 'bg-purple-600 text-white shadow-sm' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}><LayoutDashboard size={16} /> Tous</button>
+                  <button type="button" onClick={() => setFilterPeriod('today')} className={`px-3 py-1.5 sm:px-5 sm:py-2.5 rounded-xl transition-all font-medium text-sm flex items-center gap-2 ${filterPeriod === 'today' ? 'bg-purple-600 text-white shadow-sm' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}><Calendar size={16} /> Aujourd'hui</button>
+                  <button type="button" onClick={() => setFilterPeriod('week')} className={`px-3 py-1.5 sm:px-5 sm:py-2.5 rounded-xl transition-all font-medium text-sm flex items-center gap-2 ${filterPeriod === 'week' ? 'bg-purple-600 text-white shadow-sm' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}><Clock size={16} /> 7 jours</button>
+                  <button type="button" onClick={() => setFilterPeriod('month')} className={`px-3 py-1.5 sm:px-5 sm:py-2.5 rounded-xl transition-all font-medium text-sm flex items-center gap-2 ${filterPeriod === 'month' ? 'bg-purple-600 text-white shadow-sm' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}><Calendar size={16} /> 30 jours</button>
+                  <button type="button" onClick={() => setShowFilters(!showFilters)} className={`px-3 py-1.5 sm:px-5 sm:py-2.5 rounded-xl transition-all font-medium text-sm flex items-center gap-2 ${showFilters ? 'bg-purple-100 text-purple-700' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}><Filter size={16} /> Filtres <ChevronDown size={14} className={`transition-transform duration-300 ${showFilters ? 'rotate-180' : ''}`} /></button>
                 </div>
                 {showFilters && (
-                  <div className="mt-5 pt-5 border-t border-gray-100 grid md:grid-cols-3 gap-4">
-                    <div><label className="block text-sm font-medium text-gray-700 mb-2">Recherche</label><div className="relative"><Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" /><input type="text" placeholder="Nom, ville ou téléphone..." className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition-all" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} aria-label="Rechercher" /></div></div>
-                    <div><label className="block text-sm font-medium text-gray-700 mb-2">Type de don</label><select className="w-full px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition-all bg-white" value={filterType} onChange={(e) => setFilterType(e.target.value)} aria-label="Filtrer par type"><option value="all">Tous les types</option>{uniqueTypes.map(type => <option key={type} value={type}>{type}</option>)}</select></div>
-                    <div><label className="block text-sm font-medium text-gray-700 mb-2">Moyen de paiement</label><select className="w-full px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition-all bg-white" value={filterPayment} onChange={(e) => setFilterPayment(e.target.value)} aria-label="Filtrer par paiement"><option value="all">Tous les moyens</option>{uniquePayments.map(method => <option key={method} value={method}>{method}</option>)}</select></div>
+                  <div className="mt-4 pt-4 border-t border-gray-100 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <div><label className="block text-sm font-medium text-gray-700 mb-2">Recherche</label><div className="relative"><Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" /><input type="text" placeholder="Nom, ville ou téléphone..." className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition-all text-sm" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} aria-label="Rechercher" /></div></div>
+                    <div><label className="block text-sm font-medium text-gray-700 mb-2">Type de don</label><select className="w-full px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition-all bg-white text-sm" value={filterType} onChange={(e) => setFilterType(e.target.value)} aria-label="Filtrer par type"><option value="all">Tous les types</option>{uniqueTypes.map(type => <option key={type} value={type}>{type}</option>)}</select></div>
+                    <div><label className="block text-sm font-medium text-gray-700 mb-2">Moyen de paiement</label><select className="w-full px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition-all bg-white text-sm" value={filterPayment} onChange={(e) => setFilterPayment(e.target.value)} aria-label="Filtrer par paiement"><option value="all">Tous les moyens</option>{uniquePayments.map(method => <option key={method} value={method}>{method}</option>)}</select></div>
                   </div>
                 )}
               </div>
 
               {/* 4 cartes stats */}
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-                <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6"><div className="flex justify-between items-start"><div><p className="text-gray-500 text-sm mb-1">Total des dons</p><p className="text-3xl font-bold text-purple-700">{totalAmount.toLocaleString()} €</p></div><DollarSign size={32} className="text-purple-200" /></div></div>
-                <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6"><div className="flex justify-between items-start"><div><p className="text-gray-500 text-sm mb-1">Donateurs uniques</p><p className="text-3xl font-bold text-purple-700">{uniqueDonors}</p></div><Users size={32} className="text-purple-200" /></div></div>
-                <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6"><div className="flex justify-between items-start"><div><p className="text-gray-500 text-sm mb-1">Nombre de dons</p><p className="text-3xl font-bold text-purple-700">{donationCount}</p></div><Gift size={32} className="text-purple-200" /></div></div>
-                <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6"><div className="flex justify-between items-start"><div><p className="text-gray-500 text-sm mb-1">Montant moyen</p><p className="text-3xl font-bold text-purple-700">{Math.round(averageAmount).toLocaleString()} €</p></div><TrendingUp size={32} className="text-purple-200" /></div></div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-8">
+                <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 sm:p-6"><div className="flex justify-between items-start"><div><p className="text-gray-500 text-xs sm:text-sm mb-1">Total des dons</p><p className="text-2xl sm:text-3xl font-bold text-purple-700">{totalAmount.toLocaleString()} €</p></div><DollarSign size={28} className="text-purple-200" /></div></div>
+                <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 sm:p-6"><div className="flex justify-between items-start"><div><p className="text-gray-500 text-xs sm:text-sm mb-1">Donateurs uniques</p><p className="text-2xl sm:text-3xl font-bold text-purple-700">{uniqueDonors}</p></div><Users size={28} className="text-purple-200" /></div></div>
+                <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 sm:p-6"><div className="flex justify-between items-start"><div><p className="text-gray-500 text-xs sm:text-sm mb-1">Nombre de dons</p><p className="text-2xl sm:text-3xl font-bold text-purple-700">{donationCount}</p></div><Gift size={28} className="text-purple-200" /></div></div>
+                <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 sm:p-6"><div className="flex justify-between items-start"><div><p className="text-gray-500 text-xs sm:text-sm mb-1">Montant moyen</p><p className="text-2xl sm:text-3xl font-bold text-purple-700">{Math.round(averageAmount).toLocaleString()} €</p></div><TrendingUp size={28} className="text-purple-200" /></div></div>
               </div>
 
               {/* Graphiques */}
               <div className="grid lg:grid-cols-2 gap-6 mb-8">
-                <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6"><h3 className="font-semibold text-gray-800 mb-4">Répartition par type de don</h3>{donationCount === 0 ? <div className="h-64 flex items-center justify-center text-gray-400">Aucune donnée</div> : <ResponsiveContainer width="100%" height={300}><PieChart><Pie data={donationTypesData.filter(d => d.value > 0)} cx="50%" cy="50%" labelLine={false} label={({ name, percent }) => percent ? `${name} ${(percent * 100).toFixed(0)}%` : name} outerRadius={100} dataKey="value">{donationTypesData.filter(d => d.value > 0).map((_, i) => <Cell key={i} fill={COLORS[i % COLORS.length]} />)}</Pie><Tooltip formatter={(value) => [`${value} €`, 'Montant']} contentStyle={{ borderRadius: '12px', border: '1px solid #e5e7eb' }} /></PieChart></ResponsiveContainer>}</div>
-                <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6"><h3 className="font-semibold text-gray-800 mb-4">Répartition par moyen de paiement</h3>{donationCount === 0 ? <div className="h-64 flex items-center justify-center text-gray-400">Aucune donnée</div> : <ResponsiveContainer width="100%" height={300}><BarChart data={paymentMethodsData.filter(d => d.value > 0)}><CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" /><XAxis dataKey="name" stroke="#6b7280" /><YAxis stroke="#6b7280" /><Tooltip contentStyle={{ borderRadius: '12px', border: '1px solid #e5e7eb' }} /><Legend /><Bar dataKey="value" fill="#8b5cf6" name="Nombre de dons" radius={[8, 8, 0, 0]} /></BarChart></ResponsiveContainer>}</div>
+                <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 sm:p-6"><h3 className="font-semibold text-gray-800 mb-4">Répartition par type de don</h3>{donationCount === 0 ? <div className="h-64 flex items-center justify-center text-gray-400">Aucune donnée</div> : <ResponsiveContainer width="100%" height={300}><PieChart><Pie data={donationTypesData.filter(d => d.value > 0)} cx="50%" cy="50%" labelLine={false} label={({ name, percent }) => percent ? `${name} ${(percent * 100).toFixed(0)}%` : name} outerRadius={100} dataKey="value">{donationTypesData.filter(d => d.value > 0).map((_, i) => <Cell key={i} fill={COLORS[i % COLORS.length]} />)}</Pie><Tooltip formatter={(value) => [`${value} €`, 'Montant']} contentStyle={{ borderRadius: '12px', border: '1px solid #e5e7eb' }} /></PieChart></ResponsiveContainer>}</div>
+                <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 sm:p-6"><h3 className="font-semibold text-gray-800 mb-4">Répartition par moyen de paiement</h3>{donationCount === 0 ? <div className="h-64 flex items-center justify-center text-gray-400">Aucune donnée</div> : <ResponsiveContainer width="100%" height={300}><BarChart data={paymentMethodsData.filter(d => d.value > 0)}><CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" /><XAxis dataKey="name" stroke="#6b7280" tick={{ fontSize: 12 }} /><YAxis stroke="#6b7280" tick={{ fontSize: 12 }} /><Tooltip contentStyle={{ borderRadius: '12px', border: '1px solid #e5e7eb' }} /><Legend /><Bar dataKey="value" fill="#8b5cf6" name="Nombre de dons" radius={[8, 8, 0, 0]} /></BarChart></ResponsiveContainer>}</div>
               </div>
 
               {/* Évolution */}
-              <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-8"><h3 className="font-semibold text-gray-800 mb-4">Évolution des dons (7 derniers jours)</h3><ResponsiveContainer width="100%" height={300}><LineChart data={evolutionData}><CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" /><XAxis dataKey="day" stroke="#6b7280" /><YAxis stroke="#6b7280" /><Tooltip formatter={(value) => [`${value} €`, 'Montant']} contentStyle={{ borderRadius: '12px', border: '1px solid #e5e7eb' }} /><Line type="monotone" dataKey="amount" stroke="#8b5cf6" strokeWidth={2} dot={{ fill: '#8b5cf6', strokeWidth: 2 }} /></LineChart></ResponsiveContainer></div>
+              <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 sm:p-6 mb-8"><h3 className="font-semibold text-gray-800 mb-4">Évolution des dons (7 derniers jours)</h3><ResponsiveContainer width="100%" height={300}><LineChart data={evolutionData}><CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" /><XAxis dataKey="day" stroke="#6b7280" tick={{ fontSize: 12 }} /><YAxis stroke="#6b7280" tick={{ fontSize: 12 }} /><Tooltip formatter={(value) => [`${value} €`, 'Montant']} contentStyle={{ borderRadius: '12px', border: '1px solid #e5e7eb' }} /><Line type="monotone" dataKey="amount" stroke="#8b5cf6" strokeWidth={2} dot={{ fill: '#8b5cf6', strokeWidth: 2 }} /></LineChart></ResponsiveContainer></div>
 
-              {/* Top donateurs - corrigé */}
+              {/* Top donateurs */}
               {topDonorsList.length > 0 && (
-                <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-8">
+                <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 sm:p-6 mb-8">
                   <h3 className="font-semibold text-gray-800 mb-4">Top donateurs</h3>
                   <div className="overflow-x-auto">
-                    <table className="w-full">
+                    <table className="w-full min-w-[500px]">
                       <thead className="border-b border-gray-100">
                         <tr>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Rang</th>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Nom</th>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Ville</th>
-                          <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Total</th>
-                          <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase">Nb dons</th>
+                          <th className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Rang</th>
+                          <th className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Nom</th>
+                          <th className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Ville</th>
+                          <th className="px-4 sm:px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Total</th>
+                          <th className="px-4 sm:px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase">Nb dons</th>
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-gray-50">
                         {topDonorsList.map((donor, idx) => (
                           <tr key={idx} className="hover:bg-gray-50 transition">
-                            <td className="px-6 py-4 text-sm font-semibold text-purple-600">#{idx + 1}</td>
-                            <td className="px-6 py-4 text-sm text-gray-900 font-medium">{donor.name}</td>
-                            <td className="px-6 py-4 text-sm text-gray-500">{donor.city}</td>
-                            <td className="px-6 py-4 text-sm font-bold text-purple-600 text-right">{donor.total.toLocaleString()} €</td>
-                            <td className="px-6 py-4 text-sm text-gray-500 text-center">{donor.count}</td>
+                            <td className="px-4 sm:px-6 py-4 text-sm font-semibold text-purple-600">#{idx + 1}</td>
+                            <td className="px-4 sm:px-6 py-4 text-sm text-gray-900 font-medium">{donor.name}</td>
+                            <td className="px-4 sm:px-6 py-4 text-sm text-gray-500">{donor.city}</td>
+                            <td className="px-4 sm:px-6 py-4 text-sm font-bold text-purple-600 text-right">{donor.total.toLocaleString()} €</td>
+                            <td className="px-4 sm:px-6 py-4 text-sm text-gray-500 text-center">{donor.count}</td>
                           </tr>
                         ))}
                       </tbody>
@@ -619,7 +688,7 @@ const AdminDashboard = () => {
               )}
 
               {/* Liste des dons */}
-              <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6"><h3 className="font-semibold text-gray-800 mb-4">Liste des dons ({donationCount})</h3>{donationCount === 0 ? <div className="text-center py-12 text-gray-500">Aucun don pour la période sélectionnée</div> : <div className="overflow-x-auto"><table className="w-full"><thead className="border-b border-gray-100"><tr><th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Date</th><th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Nom</th><th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Ville</th><th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Montant</th><th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Type</th><th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Paiement</th><th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Téléphone</th></tr></thead><tbody className="divide-y divide-gray-50">{filteredDonations.slice(0, 50).map((don) => (<tr key={don.id} className="hover:bg-gray-50 transition"><td className="px-6 py-4 text-sm text-gray-500">{format(new Date(don.date), 'dd/MM/yyyy HH:mm')}</td><td className="px-6 py-4 text-sm font-medium text-gray-900">{don.name}</td><td className="px-6 py-4 text-sm text-gray-500">{don.city}</td><td className="px-6 py-4 text-sm font-bold text-purple-600 text-right">{don.amount} €</td><td className="px-6 py-4 text-sm"><span className="px-2 py-1 bg-purple-100 text-purple-700 rounded-full text-xs">{don.donation_type}</span></td><td className="px-6 py-4 text-sm text-gray-500">{don.payment_method}</td><td className="px-6 py-4 text-sm text-gray-500">{don.phone}</td></tr>))}</tbody></table>{filteredDonations.length > 50 && <p className="text-center text-gray-500 text-sm mt-4">Affichage des 50 premiers dons</p>}</div>}</div>
+              <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 sm:p-6"><h3 className="font-semibold text-gray-800 mb-4">Liste des dons ({donationCount})</h3>{donationCount === 0 ? <div className="text-center py-12 text-gray-500">Aucun don pour la période sélectionnée</div> : <div className="overflow-x-auto"><table className="w-full min-w-[800px]"><thead className="border-b border-gray-100"><tr><th className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Date</th><th className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Nom</th><th className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Ville</th><th className="px-4 sm:px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Montant</th><th className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Type</th><th className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Paiement</th><th className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Téléphone</th></tr></thead><tbody className="divide-y divide-gray-50">{filteredDonations.slice(0, 50).map((don) => (<tr key={don.id} className="hover:bg-gray-50 transition"><td className="px-4 sm:px-6 py-4 text-sm text-gray-500">{format(new Date(don.date), 'dd/MM/yyyy HH:mm')}</td><td className="px-4 sm:px-6 py-4 text-sm font-medium text-gray-900">{don.name}</td><td className="px-4 sm:px-6 py-4 text-sm text-gray-500">{don.city}</td><td className="px-4 sm:px-6 py-4 text-sm font-bold text-purple-600 text-right">{don.amount} €</td><td className="px-4 sm:px-6 py-4 text-sm"><span className="px-2 py-1 bg-purple-100 text-purple-700 rounded-full text-xs">{don.donation_type}</span></td><td className="px-4 sm:px-6 py-4 text-sm text-gray-500">{don.payment_method}</td><td className="px-4 sm:px-6 py-4 text-sm text-gray-500">{don.phone}</td></tr>))}</tbody></table>{filteredDonations.length > 50 && <p className="text-center text-gray-500 text-sm mt-4">Affichage des 50 premiers dons</p>}</div>}</div>
             </>
           )}
 
@@ -627,15 +696,15 @@ const AdminDashboard = () => {
           {activePage === 'requests' && (
             <div className="space-y-4">
               {requests.length === 0 ? (
-                <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-12 text-center"><CheckCircle size={48} className="mx-auto text-green-300 mb-3" /><p className="text-gray-500">Aucune demande en attente</p></div>
+                <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8 sm:p-12 text-center"><CheckCircle size={40} className="mx-auto text-green-300 mb-3" /><p className="text-gray-500">Aucune demande en attente</p></div>
               ) : (
                 requests.map((req) => (
-                  <div key={req.id} className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 hover:shadow-md transition">
-                    <div className="flex justify-between flex-wrap gap-4">
-                      <div><h3 className="text-lg font-semibold text-gray-800">{req.name}</h3><div className="grid md:grid-cols-2 gap-2 mt-2 text-sm text-gray-500"><p>{req.email}</p><p>{req.phone}</p><p>{req.age} ans</p><p>{new Date(req.created_at).toLocaleDateString()}</p></div>{req.message && <p className="mt-3 p-3 bg-gray-50 rounded-lg text-gray-600 text-sm">{req.message}</p>}</div>
-                      <div className="flex gap-2">
-                        <button type="button" onClick={() => approvePartner(req)} className="flex items-center gap-2 bg-green-600 text-white px-4 py-2 rounded-xl hover:bg-green-700 transition shadow-sm"><CheckCircle size={16} /> Approuver</button>
-                        <button type="button" onClick={() => rejectRequest(req)} className="flex items-center gap-2 bg-red-600 text-white px-4 py-2 rounded-xl hover:bg-red-700 transition shadow-sm"><XCircle size={16} /> Rejeter</button>
+                  <div key={req.id} className="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 sm:p-6 hover:shadow-md transition">
+                    <div className="flex flex-col sm:flex-row justify-between gap-4">
+                      <div><h3 className="text-lg font-semibold text-gray-800">{req.name}</h3><div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-2 text-sm text-gray-500"><p>{req.email}</p><p>{req.phone}</p><p>{req.age} ans</p><p>{new Date(req.created_at).toLocaleDateString()}</p></div>{req.message && <p className="mt-3 p-3 bg-gray-50 rounded-lg text-gray-600 text-sm">{req.message}</p>}</div>
+                      <div className="flex gap-2 flex-wrap">
+                        <button type="button" onClick={() => approvePartner(req)} className="flex items-center gap-2 bg-green-600 text-white px-4 py-2 rounded-xl hover:bg-green-700 transition shadow-sm text-sm"><CheckCircle size={16} /> Approuver</button>
+                        <button type="button" onClick={() => rejectRequest(req)} className="flex items-center gap-2 bg-red-600 text-white px-4 py-2 rounded-xl hover:bg-red-700 transition shadow-sm text-sm"><XCircle size={16} /> Rejeter</button>
                       </div>
                     </div>
                   </div>
@@ -647,7 +716,7 @@ const AdminDashboard = () => {
           {/* ========== PAGE PARTENAIRES ========== */}
           {activePage === 'partners' && (
             <div>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
                 <div className="bg-green-50 rounded-2xl p-4 border border-green-200">
                   <p className="text-green-700 text-sm font-medium">Approuvés</p>
                   <p className="text-2xl font-bold text-green-800">{approvedPartners}</p>
@@ -663,27 +732,27 @@ const AdminDashboard = () => {
               </div>
               <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
                 <div className="overflow-x-auto">
-                  <table className="w-full">
+                  <table className="w-full min-w-[800px]">
                     <thead className="bg-gray-50 border-b border-gray-100">
                       <tr>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Nom</th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Email</th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Téléphone</th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Âge</th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Date d'adhésion</th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Statut</th>
-                        <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase">Actions</th>
+                        <th className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Nom</th>
+                        <th className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Email</th>
+                        <th className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Téléphone</th>
+                        <th className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Âge</th>
+                        <th className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Date d'adhésion</th>
+                        <th className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Statut</th>
+                        <th className="px-4 sm:px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase">Actions</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-50">
                       {partners.map((partner) => (
                         <tr key={partner.id} className="hover:bg-gray-50 transition">
-                          <td className="px-6 py-4 text-sm font-medium text-gray-900">{partner.name}</td>
-                          <td className="px-6 py-4 text-sm text-gray-500">{partner.email}</td>
-                          <td className="px-6 py-4 text-sm text-gray-500">{partner.phone}</td>
-                          <td className="px-6 py-4 text-sm text-gray-500">{partner.age} ans</td>
-                          <td className="px-6 py-4 text-sm text-gray-500">{new Date(partner.created_at).toLocaleDateString()}</td>
-                          <td className="px-6 py-4">
+                          <td className="px-4 sm:px-6 py-4 text-sm font-medium text-gray-900">{partner.name}</td>
+                          <td className="px-4 sm:px-6 py-4 text-sm text-gray-500">{partner.email}</td>
+                          <td className="px-4 sm:px-6 py-4 text-sm text-gray-500">{partner.phone}</td>
+                          <td className="px-4 sm:px-6 py-4 text-sm text-gray-500">{partner.age} ans</td>
+                          <td className="px-4 sm:px-6 py-4 text-sm text-gray-500">{new Date(partner.created_at).toLocaleDateString()}</td>
+                          <td className="px-4 sm:px-6 py-4">
                             <span className={`px-2 py-1 rounded-full text-xs font-medium ${
                               partner.status === 'approved' ? 'bg-green-100 text-green-700' :
                               partner.status === 'rejected' ? 'bg-red-100 text-red-700' : 'bg-yellow-100 text-yellow-700'
@@ -691,8 +760,8 @@ const AdminDashboard = () => {
                               {partner.status === 'approved' ? 'Approuvé' : partner.status === 'rejected' ? 'Rejeté' : 'En attente'}
                             </span>
                           </td>
-                          <td className="px-6 py-4 text-center">
-                            <div className="flex justify-center gap-2">
+                          <td className="px-4 sm:px-6 py-4 text-center">
+                            <div className="flex justify-center gap-2 flex-wrap">
                               {partner.status !== 'approved' && (
                                 <button type="button" onClick={() => updatePartnerStatus(partner.id, 'approved')} className="bg-green-500 text-white px-3 py-1 rounded-lg text-xs hover:bg-green-600 transition">Approuver</button>
                               )}
@@ -714,50 +783,52 @@ const AdminDashboard = () => {
           {/* ========== PAGE ADMINISTRATEURS ========== */}
           {activePage === 'admins' && (
             <div className="space-y-6">
-              <button type="button" onClick={() => { const email = prompt('Email du nouvel administrateur:'); const name = prompt('Nom complet:'); const password = prompt('Mot de passe:'); if (email && name && password) addAdmin(email, password, name).catch(alert); }} className="bg-purple-600 text-white px-5 py-2.5 rounded-xl hover:bg-purple-700 transition shadow-sm">Ajouter un administrateur</button>
+              <button type="button" onClick={() => { const email = prompt('Email du nouvel administrateur:'); const name = prompt('Nom complet:'); const password = prompt('Mot de passe:'); if (email && name && password) addAdmin(email, password, name).catch(alert); }} className="bg-purple-600 text-white px-4 py-2 sm:px-5 sm:py-2.5 rounded-xl hover:bg-purple-700 transition shadow-sm text-sm">Ajouter un administrateur</button>
               <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-                <table className="w-full">
-                  <thead className="bg-gray-50 border-b border-gray-100">
-                    <tr>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Nom</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Email</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Date d'ajout</th>
-                      <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase">Action</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-gray-50">
-                    {admins.map((admin) => (
-                      <tr key={admin.id} className="hover:bg-gray-50 transition">
-                        <td className="px-6 py-4 text-sm font-medium text-gray-900">{admin.name}</td>
-                        <td className="px-6 py-4 text-sm text-gray-500">{admin.email}</td>
-                        <td className="px-6 py-4 text-sm text-gray-500">{new Date(admin.created_at).toLocaleDateString()}</td>
-                        <td className="px-6 py-4 text-center">
-                          <button type="button" onClick={async () => { if (confirm('Supprimer cet administrateur ?')) { await supabase.from('admins').delete().eq('id', admin.id); loadAdmins(); } }} className="text-red-500 hover:text-red-700 transition"><Trash2 size={18} /></button>
-                        </td>
+                <div className="overflow-x-auto">
+                  <table className="w-full min-w-[600px]">
+                    <thead className="bg-gray-50 border-b border-gray-100">
+                      <tr>
+                        <th className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Nom</th>
+                        <th className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Email</th>
+                        <th className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Date d'ajout</th>
+                        <th className="px-4 sm:px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase">Action</th>
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
+                    </thead>
+                    <tbody className="divide-y divide-gray-50">
+                      {admins.map((admin) => (
+                        <tr key={admin.id} className="hover:bg-gray-50 transition">
+                          <td className="px-4 sm:px-6 py-4 text-sm font-medium text-gray-900">{admin.name}</td>
+                          <td className="px-4 sm:px-6 py-4 text-sm text-gray-500">{admin.email}</td>
+                          <td className="px-4 sm:px-6 py-4 text-sm text-gray-500">{new Date(admin.created_at).toLocaleDateString()}</td>
+                          <td className="px-4 sm:px-6 py-4 text-center">
+                            <button type="button" onClick={async () => { if (confirm('Supprimer cet administrateur ?')) { await supabase.from('admins').delete().eq('id', admin.id); loadAdmins(); } }} className="text-red-500 hover:text-red-700 transition"><Trash2 size={18} /></button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
               </div>
             </div>
           )}
 
           {/* ========== PAGE PARAMÈTRES ========== */}
           {activePage === 'settings' && siteSettings && (
-            <div className="space-y-8">
-              <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
-                <div className="flex justify-between items-center flex-wrap gap-4 mb-6">
+            <div className="space-y-6 sm:space-y-8">
+              <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 sm:p-6">
+                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
                   <h3 className="text-lg font-semibold text-gray-800">Gestion des administrateurs</h3>
-                  <button type="button" onClick={() => { const email = prompt('Email du nouvel administrateur:'); const name = prompt('Nom complet:'); const password = prompt('Mot de passe:'); if (email && name && password) addAdmin(email, password, name).catch(alert); }} className="bg-purple-600 text-white px-4 py-2 rounded-xl hover:bg-purple-700 transition shadow-sm flex items-center gap-2"><UserPlus size={16} /> Ajouter un admin</button>
+                  <button type="button" onClick={() => { const email = prompt('Email du nouvel administrateur:'); const name = prompt('Nom complet:'); const password = prompt('Mot de passe:'); if (email && name && password) addAdmin(email, password, name).catch(alert); }} className="bg-purple-600 text-white px-4 py-2 rounded-xl hover:bg-purple-700 transition shadow-sm flex items-center gap-2 text-sm"><UserPlus size={16} /> Ajouter un admin</button>
                 </div>
                 <div className="overflow-x-auto">
-                  <table className="w-full">
+                  <table className="w-full min-w-[700px]">
                     <thead className="bg-gray-50 border-b border-gray-100">
                       <tr>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Nom</th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Email</th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Ajouté le</th>
-                        <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase">Actions</th>
+                        <th className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Nom</th>
+                        <th className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Email</th>
+                        <th className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Ajouté le</th>
+                        <th className="px-4 sm:px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase">Actions</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-50">
@@ -765,14 +836,14 @@ const AdminDashboard = () => {
                         const isEditing = editingAdminId === admin.id;
                         return (
                           <tr key={admin.id} className="hover:bg-gray-50 transition">
-                            <td className="px-6 py-4 text-sm">
-                              {isEditing ? <input type="text" value={editAdminName} onChange={(e) => setEditAdminName(e.target.value)} className="border border-gray-300 rounded-lg px-2 py-1 w-full" aria-label="Nouveau nom" /> : <span className="font-medium text-gray-900">{admin.name}</span>}
+                            <td className="px-4 sm:px-6 py-4 text-sm">
+                              {isEditing ? <input type="text" value={editAdminName} onChange={(e) => setEditAdminName(e.target.value)} className="border border-gray-300 rounded-lg px-2 py-1 w-full text-sm" aria-label="Nouveau nom" /> : <span className="font-medium text-gray-900">{admin.name}</span>}
                             </td>
-                            <td className="px-6 py-4 text-sm">
-                              {isEditing ? <input type="email" value={editAdminEmail} onChange={(e) => setEditAdminEmail(e.target.value)} className="border border-gray-300 rounded-lg px-2 py-1 w-full" aria-label="Nouvel email" /> : <span className="text-gray-500">{admin.email}</span>}
+                            <td className="px-4 sm:px-6 py-4 text-sm">
+                              {isEditing ? <input type="email" value={editAdminEmail} onChange={(e) => setEditAdminEmail(e.target.value)} className="border border-gray-300 rounded-lg px-2 py-1 w-full text-sm" aria-label="Nouvel email" /> : <span className="text-gray-500">{admin.email}</span>}
                             </td>
-                            <td className="px-6 py-4 text-sm text-gray-500">{new Date(admin.created_at).toLocaleDateString()}</td>
-                            <td className="px-6 py-4 text-center">
+                            <td className="px-4 sm:px-6 py-4 text-sm text-gray-500">{new Date(admin.created_at).toLocaleDateString()}</td>
+                            <td className="px-4 sm:px-6 py-4 text-center">
                               <div className="flex justify-center gap-2 flex-wrap">
                                 {isEditing ? (
                                   <>
@@ -797,13 +868,13 @@ const AdminDashboard = () => {
                   </table>
                 </div>
                 <div className="mt-6 pt-4 border-t border-gray-100">
-                  <button type="button" onClick={() => setShowDeleteAllAdminsConfirm(true)} className="bg-red-50 text-red-600 border border-red-200 px-4 py-2 rounded-xl hover:bg-red-100 transition flex items-center gap-2"><Trash2 size={16} /> Supprimer tous les autres administrateurs</button>
+                  <button type="button" onClick={() => setShowDeleteAllAdminsConfirm(true)} className="bg-red-50 text-red-600 border border-red-200 px-4 py-2 rounded-xl hover:bg-red-100 transition flex items-center gap-2 text-sm"><Trash2 size={16} /> Supprimer tous les autres administrateurs</button>
                   <p className="text-xs text-gray-400 mt-2">Cette action est irréversible. Vous-même (l'admin connecté) ne serez pas supprimé.</p>
                 </div>
               </div>
 
-              <div className="bg-red-50 rounded-2xl shadow-sm border border-red-200 p-6">
-                <div className="flex items-center justify-between flex-wrap gap-4">
+              <div className="bg-red-50 rounded-2xl shadow-sm border border-red-200 p-4 sm:p-6">
+                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                   <div>
                     <h3 className="text-lg font-semibold text-red-700 flex items-center gap-2"><StopCircle size={20} className="text-red-600" /> Arrêter le site (mode maintenance)</h3>
                     <p className="text-sm text-red-600 mt-1">Activez cette option pour afficher une page de maintenance aux visiteurs. Seuls les administrateurs pourront accéder au back-office.</p>
@@ -813,9 +884,9 @@ const AdminDashboard = () => {
                       {siteSettings.maintenance_mode ? 'Site arrêté' : 'Site actif'}
                     </span>
                     {!siteSettings.maintenance_mode ? (
-                      <button type="button" onClick={() => setShowMaintenanceConfirm(true)} className="bg-red-600 text-white px-5 py-2 rounded-xl hover:bg-red-700 transition shadow-sm flex items-center gap-2"><Power size={16} /> Arrêter le site</button>
+                      <button type="button" onClick={() => setShowMaintenanceConfirm(true)} className="bg-red-600 text-white px-4 py-2 rounded-xl hover:bg-red-700 transition shadow-sm flex items-center gap-2 text-sm"><Power size={16} /> Arrêter le site</button>
                     ) : (
-                      <button type="button" onClick={() => toggleMaintenanceMode(false)} className="bg-green-600 text-white px-5 py-2 rounded-xl hover:bg-green-700 transition shadow-sm">Réactiver le site</button>
+                      <button type="button" onClick={() => toggleMaintenanceMode(false)} className="bg-green-600 text-white px-4 py-2 rounded-xl hover:bg-green-700 transition shadow-sm text-sm">Réactiver le site</button>
                     )}
                   </div>
                 </div>
@@ -828,14 +899,14 @@ const AdminDashboard = () => {
       {/* MODALS */}
       {showMaintenanceConfirm && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-xl">
+          <div className="bg-white rounded-2xl max-w-md w-full p-5 sm:p-6 shadow-xl">
             <div className="flex items-center gap-3 text-red-600 mb-4"><AlertTriangle size={24} /><h3 className="text-xl font-bold">Confirmation requise</h3></div>
-            <p className="text-gray-600 mb-4">Vous allez <strong>arrêter le site</strong> (mode maintenance). Tous les visiteurs verront une page de maintenance.</p>
-            <p className="text-gray-600 mb-2">Veuillez taper <strong className="font-mono bg-gray-100 px-2 py-1 rounded">ARRÊTER LE SITE</strong> pour confirmer :</p>
-            <input type="text" value={maintenanceConfirmText} onChange={(e) => setMaintenanceConfirmText(e.target.value)} className="w-full border border-gray-300 rounded-xl px-4 py-2 mb-4 focus:ring-2 focus:ring-red-500" placeholder="ARRÊTER LE SITE" aria-label="Confirmation" />
+            <p className="text-gray-600 mb-4 text-sm">Vous allez <strong>arrêter le site</strong> (mode maintenance). Tous les visiteurs verront une page de maintenance.</p>
+            <p className="text-gray-600 mb-2 text-sm">Veuillez taper <strong className="font-mono bg-gray-100 px-2 py-1 rounded">ARRÊTER LE SITE</strong> pour confirmer :</p>
+            <input type="text" value={maintenanceConfirmText} onChange={(e) => setMaintenanceConfirmText(e.target.value)} className="w-full border border-gray-300 rounded-xl px-4 py-2 mb-4 focus:ring-2 focus:ring-red-500 text-sm" placeholder="ARRÊTER LE SITE" aria-label="Confirmation" />
             <div className="flex justify-end gap-3">
-              <button type="button" onClick={() => { setShowMaintenanceConfirm(false); setMaintenanceConfirmText(''); }} className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">Annuler</button>
-              <button type="button" onClick={() => { if (maintenanceConfirmText === 'ARRÊTER LE SITE') toggleMaintenanceMode(true); else alert("La phrase saisie est incorrecte."); }} className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700">Confirmer l'arrêt</button>
+              <button type="button" onClick={() => { setShowMaintenanceConfirm(false); setMaintenanceConfirmText(''); }} className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 text-sm">Annuler</button>
+              <button type="button" onClick={() => { if (maintenanceConfirmText === 'ARRÊTER LE SITE') toggleMaintenanceMode(true); else alert("La phrase saisie est incorrecte."); }} className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 text-sm">Confirmer l'arrêt</button>
             </div>
           </div>
         </div>
@@ -843,14 +914,14 @@ const AdminDashboard = () => {
 
       {showDeleteAllAdminsConfirm && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-xl">
+          <div className="bg-white rounded-2xl max-w-md w-full p-5 sm:p-6 shadow-xl">
             <div className="flex items-center gap-3 text-red-600 mb-4"><AlertTriangle size={24} /><h3 className="text-xl font-bold">Suppression massive</h3></div>
-            <p className="text-gray-600 mb-4">Vous allez <strong>supprimer tous les autres administrateurs</strong>. Vous seul resterez.</p>
-            <p className="text-gray-600 mb-2">Tapez <strong className="font-mono bg-gray-100 px-2 py-1 rounded">SUPPRIMER TOUS</strong> pour confirmer :</p>
-            <input type="text" value={deleteAllConfirmText} onChange={(e) => setDeleteAllConfirmText(e.target.value)} className="w-full border border-gray-300 rounded-xl px-4 py-2 mb-4 focus:ring-2 focus:ring-red-500" placeholder="SUPPRIMER TOUS" aria-label="Confirmation" />
+            <p className="text-gray-600 mb-4 text-sm">Vous allez <strong>supprimer tous les autres administrateurs</strong>. Vous seul resterez.</p>
+            <p className="text-gray-600 mb-2 text-sm">Tapez <strong className="font-mono bg-gray-100 px-2 py-1 rounded">SUPPRIMER TOUS</strong> pour confirmer :</p>
+            <input type="text" value={deleteAllConfirmText} onChange={(e) => setDeleteAllConfirmText(e.target.value)} className="w-full border border-gray-300 rounded-xl px-4 py-2 mb-4 focus:ring-2 focus:ring-red-500 text-sm" placeholder="SUPPRIMER TOUS" aria-label="Confirmation" />
             <div className="flex justify-end gap-3">
-              <button type="button" onClick={() => { setShowDeleteAllAdminsConfirm(false); setDeleteAllConfirmText(''); }} className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">Annuler</button>
-              <button type="button" onClick={() => { if (deleteAllConfirmText === 'SUPPRIMER TOUS') deleteAllAdminsExceptCurrent(); else alert("La phrase saisie est incorrecte."); }} className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700">Confirmer la suppression</button>
+              <button type="button" onClick={() => { setShowDeleteAllAdminsConfirm(false); setDeleteAllConfirmText(''); }} className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 text-sm">Annuler</button>
+              <button type="button" onClick={() => { if (deleteAllConfirmText === 'SUPPRIMER TOUS') deleteAllAdminsExceptCurrent(); else alert("La phrase saisie est incorrecte."); }} className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 text-sm">Confirmer la suppression</button>
             </div>
           </div>
         </div>
@@ -858,22 +929,22 @@ const AdminDashboard = () => {
 
       {showPasswordForm && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-xl">
+          <div className="bg-white rounded-2xl max-w-md w-full p-5 sm:p-6 shadow-xl">
             <div className="flex items-center gap-3 text-purple-600 mb-4"><Lock size={24} /><h3 className="text-xl font-bold">Changer mon mot de passe</h3></div>
             <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Nouveau mot de passe</label>
-                <input type="password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} className="w-full border border-gray-300 rounded-xl px-4 py-2 focus:ring-2 focus:ring-purple-500" placeholder="••••••" />
+                <input type="password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} className="w-full border border-gray-300 rounded-xl px-4 py-2 focus:ring-2 focus:ring-purple-500 text-sm" placeholder="••••••" />
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Confirmer le mot de passe</label>
-                <input type="password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} className="w-full border border-gray-300 rounded-xl px-4 py-2 focus:ring-2 focus:ring-purple-500" placeholder="••••••" />
+                <input type="password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} className="w-full border border-gray-300 rounded-xl px-4 py-2 focus:ring-2 focus:ring-purple-500 text-sm" placeholder="••••••" />
               </div>
               {passwordError && <p className="text-red-500 text-sm">{passwordError}</p>}
             </div>
             <div className="flex justify-end gap-3 mt-6">
-              <button type="button" onClick={() => { setShowPasswordForm(false); setNewPassword(''); setConfirmPassword(''); setPasswordError(''); }} className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">Annuler</button>
-              <button type="button" onClick={changeMyPassword} className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700">Changer</button>
+              <button type="button" onClick={() => { setShowPasswordForm(false); setNewPassword(''); setConfirmPassword(''); setPasswordError(''); }} className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 text-sm">Annuler</button>
+              <button type="button" onClick={changeMyPassword} className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 text-sm">Changer</button>
             </div>
           </div>
         </div>
