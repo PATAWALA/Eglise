@@ -651,7 +651,7 @@ const AdminDashboard = () => {
         </div>
 
         {/* Contenu scrollable */}
-        <div ref={contentRef} className="flex-1 overflow-y-auto p-4 sm:p-6">
+        <div ref={contentRef} className="flex-1 overflow-y-auto pt-8 sm:pt-6 pb-4 sm:pb-6 px-4 sm:px-6">
           {/* ========== PAGE DASHBOARD ========== */}
           {activePage === 'dashboard' && (
             <>
