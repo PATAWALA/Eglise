@@ -481,7 +481,7 @@ const PartnerDashboard = () => {
             <div className="flex items-center justify-between w-full">
               {!sidebarCollapsed && (
                 <div>
-                  <h1 className="text-lg md:text-xl font-bold text-purple-700">Dieu est bon</h1>
+                  <h1 className="text-lg md:text-xl font-bold text-purple-700">Récompense céleste</h1>
                 </div>
               )}
               <div className="flex gap-2">
@@ -580,80 +580,97 @@ const PartnerDashboard = () => {
         ml-0
       `}>
         {/* Header fixe - hauteur identique à la sidebar (h-20) */}
-        <div className="flex-shrink-0 bg-white shadow-sm border-b border-gray-100 z-20">
-  <div className="px-4 sm:px-6 md:px-8 py-3 md:py-4">
-    <div className="flex justify-between items-center gap-3">
-      <div>
-        <h1 className="text-xl md:text-2xl font-bold text-gray-800">
-          {activeTab === 'overview' && 'Tableau de bord'}
-          {activeTab === 'donations' && 'Mes dons'}
-          {activeTab === 'analytics' && 'Analytiques'}
-          {activeTab === 'settings' && 'Paramètres'}
-        </h1>
-        <p className="text-xs md:text-sm text-gray-500 mt-0.5 hidden sm:block">
-          Bienvenue, {partner.name} ! Que Dieu vous bénisse.
-        </p>
-      </div>
+        <div className="flex-shrink-0 bg-white shadow-sm border-b border-gray-100 z-20 h-20">
+          <div className="px-4 sm:px-6 md:px-8 h-full flex items-center justify-between">
+            <h1 className="text-xl md:text-2xl font-bold text-gray-800">
+              {activeTab === 'overview' && 'Tableau de bord'}
+              {activeTab === 'donations' && 'Mes dons'}
+              {activeTab === 'analytics' && 'Analytiques'}
+              {activeTab === 'settings' && 'Paramètres'}
+            </h1>
+            <div className="flex items-center gap-2 md:gap-4">
+              {/* Message de bienvenue (visible uniquement sur desktop pour ne pas casser la hauteur mobile) */}
+              <p className="text-xs text-gray-500 hidden sm:block">
+                Bienvenue, {partner.name}
+              </p>
 
-      <div className="flex items-center gap-2 md:gap-4">
-        {/* Notifications */}
-        <div className="relative">
-          <button
-            onClick={() => setShowNotifications(!showNotifications)}
-            className="relative p-2 hover:bg-gray-100 rounded-lg transition"
-            aria-label="Notifications"
-            type="button"
-          >
-            <Bell size={20} />
-            {notifications.filter(n => !n.read).length > 0 && (
-              <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
-            )}
-          </button>
-          {/* Modal notifications - version responsive corrigée */}
-          {showNotifications && (
-            <div className="absolute right-0 mt-2 w-80 max-w-[calc(100vw-2rem)] bg-white rounded-xl shadow-lg border border-gray-200 z-20 overflow-hidden">
-              <div className="p-3 md:p-4 border-b border-gray-200">
-                <h3 className="font-semibold">Notifications</h3>
+              {/* Notifications */}
+              <div className="relative">
+                <button
+                  onClick={() => setShowNotifications(!showNotifications)}
+                  className="relative p-2 hover:bg-gray-100 rounded-lg transition"
+                  aria-label="Notifications"
+                  type="button"
+                >
+                  <Bell size={20} />
+                  {notifications.filter(n => !n.read).length > 0 && (
+                    <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
+                  )}
+                </button>
+                {showNotifications && (
+                  <>
+                    <div
+                      className="fixed inset-0 bg-black/50 z-40 md:hidden"
+                      onClick={() => setShowNotifications(false)}
+                    />
+                    <div className={`
+                      fixed md:absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2
+                      md:top-auto md:left-auto md:right-0 md:mt-2 md:-translate-x-0 md:translate-y-0
+                      z-50 w-[calc(100%-2rem)] max-w-md md:w-80
+                      bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden
+                    `}>
+                      <div className="p-3 md:p-4 border-b border-gray-200 flex justify-between items-center">
+                        <h3 className="font-semibold">Notifications</h3>
+                        <button
+                          onClick={() => setShowNotifications(false)}
+                          className="p-1 hover:bg-gray-100 rounded-lg md:hidden"
+                          aria-label="Fermer"
+                        >
+                          <X size={20} />
+                        </button>
+                      </div>
+                      <div className="max-h-96 overflow-y-auto">
+                        {notifications.length === 0 ? (
+                          <div className="p-4 text-center text-gray-500">Aucune notification</div>
+                        ) : (
+                          notifications.map(notif => (
+                            <div
+                              key={notif.id}
+                              onClick={() => {
+                                markNotificationAsRead(notif.id);
+                                setShowNotifications(false);
+                              }}
+                              className={`p-3 md:p-4 border-b border-gray-100 cursor-pointer hover:bg-gray-50 transition ${
+                                !notif.read ? 'bg-purple-50' : ''
+                              }`}
+                            >
+                              <p className="font-medium text-sm">{notif.title}</p>
+                              <p className="text-xs text-gray-500 mt-1">{notif.message}</p>
+                              <p className="text-xs text-gray-400 mt-2">
+                                {format(new Date(notif.created_at), 'dd/MM/yyyy HH:mm')}
+                              </p>
+                            </div>
+                          ))
+                        )}
+                      </div>
+                    </div>
+                  </>
+                )}
               </div>
-              <div className="max-h-96 overflow-y-auto">
-                {notifications.map(notif => (
-                  <div
-                    key={notif.id}
-                    onClick={() => markNotificationAsRead(notif.id)}
-                    className={`p-3 md:p-4 border-b border-gray-100 cursor-pointer hover:bg-gray-50 transition ${
-                      !notif.read ? 'bg-purple-50' : ''
-                    }`}
-                  >
-                    <p className="font-medium text-sm">{notif.title}</p>
-                    <p className="text-xs text-gray-500 mt-1">{notif.message}</p>
-                    <p className="text-xs text-gray-400 mt-2">
-                      {format(new Date(notif.created_at), 'dd/MM/yyyy HH:mm')}
-                    </p>
-                  </div>
-                ))}
-              </div>
+
+              {/* Bouton Faire un don */}
+              <button
+                onClick={() => setShowGiveModal(true)}
+                className="flex items-center gap-1 md:gap-2 bg-purple-600 text-white px-3 py-1.5 md:px-5 md:py-2 rounded-xl hover:bg-purple-700 transition-all text-sm md:text-base"
+                type="button"
+              >
+                <Gift size={16} className="md:w-5 md:h-5" />
+                <span className="font-medium hidden sm:inline">Faire un don</span>
+                <span className="font-medium sm:hidden">Don</span>
+              </button>
             </div>
-          )}
+          </div>
         </div>
-
-        {/* Bouton Faire un don */}
-        <button
-          onClick={() => setShowGiveModal(true)}
-          className="flex items-center gap-1 md:gap-2 bg-purple-600 text-white px-3 py-1.5 md:px-5 md:py-2 rounded-xl hover:bg-purple-700 transition-all text-sm md:text-base"
-          type="button"
-        >
-          <Gift size={16} className="md:w-5 md:h-5" />
-          <span className="font-medium hidden sm:inline">Faire un don</span>
-          <span className="font-medium sm:hidden">Don</span>
-        </button>
-      </div>
-    </div>
-    {/* Petit message de bienvenue visible uniquement sur mobile (optionnel) */}
-    <p className="text-xs text-gray-500 mt-2 sm:hidden">
-      Bienvenue, {partner.name} ! Que Dieu vous bénisse.
-    </p>
-  </div>
-</div>
 
         {/* Contenu scrollable avec padding supplémentaire sur mobile */}
         <div className="flex-1 overflow-y-auto p-4 sm:p-6 md:p-8 pt-8 sm:pt-6">
