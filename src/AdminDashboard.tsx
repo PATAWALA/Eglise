@@ -616,7 +616,7 @@ const AdminDashboard = () => {
       </button>
 
       {/* MAIN CONTENT - Structure avec flex-col pour header fixe */}
-      <main className="flex-1 min-w-0 transition-all duration-300 ml-0 md:ml-64 flex flex-col h-screen overflow-hidden">
+      <main className={`flex-1 min-w-0 transition-all duration-300 ${sidebarCollapsed ? 'md:ml-20' : 'md:ml-64'} ml-0 flex flex-col h-screen overflow-hidden`}>
         {/* Header fixe - hauteur identique à la sidebar (h-20) */}
         <div className="flex-shrink-0 bg-white shadow-sm border-b border-gray-100 z-20 h-20">
           <div className="px-4 sm:px-6 h-full flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
