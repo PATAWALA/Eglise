@@ -208,28 +208,28 @@ const DevenirPartenaire = () => {
           </div>
         </motion.div>
 
-        {/* Onglets séparés (hors formulaire) - responsive */}
+        {/* Onglets séparés (hors formulaire) - boutons plus hauts */}
         <div className="flex justify-center gap-2 sm:gap-3 mb-4 sm:mb-5">
           <button
             onClick={() => { setMode('register'); setError(''); setSuccess(false); }}
-            className={`px-4 sm:px-6 py-1.5 sm:py-2 rounded-xl font-medium transition-all duration-300 text-xs sm:text-sm ${
+            className={`px-5 sm:px-7 py-2 sm:py-2.5 rounded-xl font-medium transition-all duration-300 text-sm sm:text-base ${
               mode === 'register'
                 ? 'bg-purple-600 text-white shadow-md'
                 : 'bg-white text-gray-600 border border-gray-200 hover:bg-gray-50'
             }`}
           >
-            <User className="inline w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-1.5" />
+            <User className="inline w-4 h-4 mr-1.5" />
             Inscription
           </button>
           <button
             onClick={() => { setMode('login'); setError(''); setSuccess(false); }}
-            className={`px-4 sm:px-6 py-1.5 sm:py-2 rounded-xl font-medium transition-all duration-300 text-xs sm:text-sm ${
+            className={`px-5 sm:px-7 py-2 sm:py-2.5 rounded-xl font-medium transition-all duration-300 text-sm sm:text-base ${
               mode === 'login'
                 ? 'bg-purple-600 text-white shadow-md'
                 : 'bg-white text-gray-600 border border-gray-200 hover:bg-gray-50'
             }`}
           >
-            <Lock className="inline w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-1.5" />
+            <Lock className="inline w-4 h-4 mr-1.5" />
             Connexion
           </button>
         </div>
@@ -251,17 +251,17 @@ const DevenirPartenaire = () => {
                   exit={{ opacity: 0, y: -10 }}
                   transition={{ duration: 0.2 }}
                   onSubmit={handleRegister}
-                  className="space-y-3 sm:space-y-4"
+                  className="space-y-4 sm:space-y-5"
                 >
                   <div>
                     <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">Nom complet *</label>
                     <div className="relative">
-                      <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-3 h-3 sm:w-4 sm:h-4" />
+                      <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
                       <input
                         type="text"
                         required
                         placeholder="Jean Dupont"
-                        className="w-full pl-8 sm:pl-9 pr-3 py-1.5 sm:py-2 text-xs sm:text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                        className="w-full pl-10 pr-3 py-2 sm:py-2.5 text-sm sm:text-base border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                         value={registerData.name}
                         onChange={(e) => setRegisterData({...registerData, name: e.target.value})}
                       />
@@ -271,12 +271,12 @@ const DevenirPartenaire = () => {
                   <div>
                     <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">Email *</label>
                     <div className="relative">
-                      <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-3 h-3 sm:w-4 sm:h-4" />
+                      <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
                       <input
                         type="email"
                         required
                         placeholder="jean.dupont@email.com"
-                        className="w-full pl-8 sm:pl-9 pr-3 py-1.5 sm:py-2 text-xs sm:text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                        className="w-full pl-10 pr-3 py-2 sm:py-2.5 text-sm sm:text-base border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                         value={registerData.email}
                         onChange={(e) => setRegisterData({...registerData, email: e.target.value})}
                       />
@@ -286,21 +286,21 @@ const DevenirPartenaire = () => {
                   <div>
                     <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">Mot de passe *</label>
                     <div className="relative">
-                      <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-3 h-3 sm:w-4 sm:h-4" />
+                      <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
                       <input
                         type={showPassword ? "text" : "password"}
                         required
                         placeholder="••••••••"
-                        className="w-full pl-8 sm:pl-9 pr-8 sm:pr-9 py-1.5 sm:py-2 text-xs sm:text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                        className="w-full pl-10 pr-10 py-2 sm:py-2.5 text-sm sm:text-base border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                         value={registerData.password}
                         onChange={(e) => setRegisterData({...registerData, password: e.target.value})}
                       />
                       <button
                         type="button"
                         onClick={() => setShowPassword(!showPassword)}
-                        className="absolute right-2 sm:right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                        className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
                       >
-                        {showPassword ? <EyeOff size={14} className="sm:w-4 sm:h-4" /> : <Eye size={14} className="sm:w-4 sm:h-4" />}
+                        {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                       </button>
                     </div>
                   </div>
@@ -308,12 +308,12 @@ const DevenirPartenaire = () => {
                   <div>
                     <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">Téléphone *</label>
                     <div className="relative">
-                      <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-3 h-3 sm:w-4 sm:h-4" />
+                      <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
                       <input
                         type="tel"
                         required
                         placeholder="+225 07 XX XX XX XX"
-                        className="w-full pl-8 sm:pl-9 pr-3 py-1.5 sm:py-2 text-xs sm:text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                        className="w-full pl-10 pr-3 py-2 sm:py-2.5 text-sm sm:text-base border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                         value={registerData.phone}
                         onChange={(e) => setRegisterData({...registerData, phone: e.target.value})}
                       />
@@ -323,14 +323,14 @@ const DevenirPartenaire = () => {
                   <div>
                     <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">Âge * (18 ans minimum)</label>
                     <div className="relative">
-                      <Calendar className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-3 h-3 sm:w-4 sm:h-4" />
+                      <Calendar className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
                       <input
                         type="number"
                         required
                         min="18"
                         max="120"
                         placeholder="25"
-                        className="w-full pl-8 sm:pl-9 pr-3 py-1.5 sm:py-2 text-xs sm:text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                        className="w-full pl-10 pr-3 py-2 sm:py-2.5 text-sm sm:text-base border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                         value={registerData.age}
                         onChange={(e) => setRegisterData({...registerData, age: e.target.value})}
                       />
@@ -342,7 +342,7 @@ const DevenirPartenaire = () => {
                     <textarea
                       rows={2}
                       placeholder="Votre message..."
-                      className="w-full px-3 py-1.5 sm:py-2 text-xs sm:text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-none"
+                      className="w-full px-3 py-2 sm:py-2.5 text-sm sm:text-base border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-none"
                       value={registerData.message}
                       onChange={(e) => setRegisterData({...registerData, message: e.target.value})}
                     />
@@ -365,13 +365,13 @@ const DevenirPartenaire = () => {
                   <button
                     type="submit"
                     disabled={loading}
-                    className="w-full bg-purple-600 text-white py-2 sm:py-2.5 rounded-lg hover:bg-purple-700 transition-all duration-300 font-medium text-xs sm:text-sm disabled:opacity-50 flex items-center justify-center gap-2 shadow-sm"
+                    className="w-full bg-purple-600 text-white py-3 sm:py-3.5 rounded-lg hover:bg-purple-700 transition-all duration-300 font-medium text-sm sm:text-base disabled:opacity-50 flex items-center justify-center gap-2 shadow-md"
                   >
                     {loading ? (
-                      <div className="animate-spin rounded-full h-3 w-3 sm:h-4 sm:w-4 border-2 border-white border-t-transparent" />
+                      <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent" />
                     ) : (
                       <>
-                        <Heart size={14} className="sm:w-4 sm:h-4" />
+                        <Heart size={18} />
                         Envoyer ma demande
                       </>
                     )}
@@ -387,17 +387,17 @@ const DevenirPartenaire = () => {
                   exit={{ opacity: 0, y: -10 }}
                   transition={{ duration: 0.2 }}
                   onSubmit={handleLogin}
-                  className="space-y-3 sm:space-y-4"
+                  className="space-y-4 sm:space-y-5"
                 >
                   <div>
                     <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">Email</label>
                     <div className="relative">
-                      <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-3 h-3 sm:w-4 sm:h-4" />
+                      <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
                       <input
                         type="email"
                         required
                         placeholder="jean.dupont@email.com"
-                        className="w-full pl-8 sm:pl-9 pr-3 py-1.5 sm:py-2 text-xs sm:text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                        className="w-full pl-10 pr-3 py-2 sm:py-2.5 text-sm sm:text-base border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                         value={loginData.email}
                         onChange={(e) => setLoginData({...loginData, email: e.target.value})}
                       />
@@ -407,21 +407,21 @@ const DevenirPartenaire = () => {
                   <div>
                     <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">Mot de passe</label>
                     <div className="relative">
-                      <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-3 h-3 sm:w-4 sm:h-4" />
+                      <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
                       <input
                         type={showPassword ? "text" : "password"}
                         required
                         placeholder="••••••••"
-                        className="w-full pl-8 sm:pl-9 pr-8 sm:pr-9 py-1.5 sm:py-2 text-xs sm:text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                        className="w-full pl-10 pr-10 py-2 sm:py-2.5 text-sm sm:text-base border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                         value={loginData.password}
                         onChange={(e) => setLoginData({...loginData, password: e.target.value})}
                       />
                       <button
                         type="button"
                         onClick={() => setShowPassword(!showPassword)}
-                        className="absolute right-2 sm:right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                        className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
                       >
-                        {showPassword ? <EyeOff size={14} className="sm:w-4 sm:h-4" /> : <Eye size={14} className="sm:w-4 sm:h-4" />}
+                        {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                       </button>
                     </div>
                   </div>
@@ -435,10 +435,10 @@ const DevenirPartenaire = () => {
                   <button
                     type="submit"
                     disabled={loading}
-                    className="w-full bg-purple-600 text-white py-2 sm:py-2.5 rounded-lg hover:bg-purple-700 transition-all duration-300 font-medium text-xs sm:text-sm disabled:opacity-50 flex items-center justify-center gap-2 shadow-sm"
+                    className="w-full bg-purple-600 text-white py-3 sm:py-3.5 rounded-lg hover:bg-purple-700 transition-all duration-300 font-medium text-sm sm:text-base disabled:opacity-50 flex items-center justify-center gap-2 shadow-md"
                   >
                     {loading ? (
-                      <div className="animate-spin rounded-full h-3 w-3 sm:h-4 sm:w-4 border-2 border-white border-t-transparent" />
+                      <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent" />
                     ) : (
                       'Se connecter'
                     )}
@@ -449,13 +449,13 @@ const DevenirPartenaire = () => {
           </div>
         </motion.div>
 
-        {/* Bouton Retour à l'accueil en bas */}
+        {/* Bouton Retour à l'accueil en bas - également plus haut */}
         <div className="mt-6 flex justify-center">
           <button
             onClick={() => navigate('/')}
-            className="inline-flex items-center gap-2 bg-purple-600 text-white px-5 py-1.5 sm:px-6 sm:py-2 rounded-lg hover:bg-purple-700 transition-all duration-300 shadow-sm text-xs sm:text-sm font-medium"
+            className="inline-flex items-center gap-2 bg-purple-600 text-white px-6 py-2.5 sm:px-7 sm:py-3 rounded-lg hover:bg-purple-700 transition-all duration-300 shadow-md text-sm sm:text-base font-medium"
           >
-            <ArrowLeft size={14} className="sm:w-4 sm:h-4" />
+            <ArrowLeft size={18} />
             Retour à l'accueil
           </button>
         </div>
