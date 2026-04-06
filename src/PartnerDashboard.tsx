@@ -579,108 +579,189 @@ const PartnerDashboard = () => {
         ${sidebarCollapsed ? 'md:ml-20' : 'md:ml-72'}
         ml-0
       `}>
-        {/* Header fixe - hauteur identique à la sidebar (h-20) */}
-        <div className="flex-shrink-0 bg-white shadow-sm border-b border-gray-100 z-20 h-20">
-          <div className="px-4 sm:px-6 md:px-8 h-full flex items-center justify-between">
-            <h1 className="text-xl md:text-2xl font-bold text-gray-800">
-              {activeTab === 'overview' && 'Tableau de bord'}
-              {activeTab === 'donations' && 'Mes dons'}
-              {activeTab === 'analytics' && 'Analytiques'}
-              {activeTab === 'settings' && 'Paramètres'}
-            </h1>
-            <div className="flex items-center gap-2 md:gap-4">
-              {/* Message de bienvenue complet (visible sur desktop seulement) */}
-              <p className="text-sm text-gray-600 hidden sm:block">
-                Bienvenue, {partner.name} ! Soyez béni(e)
-              </p>
-
-              {/* Notifications */}
-              <div className="relative">
+        {/* Header - version desktop et mobile séparées */}
+        <div className="flex-shrink-0 bg-white shadow-sm border-b border-gray-100 z-20 md:h-20">
+          <div className="px-4 sm:px-6 md:px-8 py-3 md:py-0 md:h-full">
+            {/* Version desktop (md et plus) */}
+            <div className="hidden md:flex items-center justify-between h-full">
+              <h1 className="text-xl md:text-2xl font-bold text-gray-800">
+                {activeTab === 'overview' && 'Tableau de bord'}
+                {activeTab === 'donations' && 'Mes dons'}
+                {activeTab === 'analytics' && 'Analytiques'}
+                {activeTab === 'settings' && 'Paramètres'}
+              </h1>
+              <div className="flex items-center gap-4">
+                <p className="text-sm text-gray-600">
+                  Bienvenue, {partner.name} ! Soyez béni(e)
+                </p>
+                {/* Notifications */}
+                <div className="relative">
+                  <button
+                    onClick={() => setShowNotifications(!showNotifications)}
+                    className="relative p-2 hover:bg-gray-100 rounded-lg transition"
+                    aria-label="Notifications"
+                    type="button"
+                  >
+                    <Bell size={20} />
+                    {notifications.filter(n => !n.read).length > 0 && (
+                      <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
+                    )}
+                  </button>
+                  {showNotifications && (
+                    <>
+                      <div
+                        className="fixed inset-0 bg-black/50 z-40 md:hidden"
+                        onClick={() => setShowNotifications(false)}
+                      />
+                      <div className={`
+                        fixed md:absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2
+                        md:top-auto md:left-auto md:right-0 md:mt-2 md:-translate-x-0 md:translate-y-0
+                        z-50 w-[calc(100%-2rem)] max-w-md md:w-80
+                        bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden
+                      `}>
+                        <div className="p-3 md:p-4 border-b border-gray-200 flex justify-between items-center">
+                          <h3 className="font-semibold">Notifications</h3>
+                          <button
+                            onClick={() => setShowNotifications(false)}
+                            className="p-1 hover:bg-gray-100 rounded-lg md:hidden"
+                            aria-label="Fermer"
+                          >
+                            <X size={20} />
+                          </button>
+                        </div>
+                        <div className="max-h-96 overflow-y-auto">
+                          {notifications.length === 0 ? (
+                            <div className="p-4 text-center text-gray-500">Aucune notification</div>
+                          ) : (
+                            notifications.map(notif => (
+                              <div
+                                key={notif.id}
+                                onClick={() => {
+                                  markNotificationAsRead(notif.id);
+                                  setShowNotifications(false);
+                                }}
+                                className={`p-3 md:p-4 border-b border-gray-100 cursor-pointer hover:bg-gray-50 transition ${
+                                  !notif.read ? 'bg-purple-50' : ''
+                                }`}
+                              >
+                                <p className="font-medium text-sm">{notif.title}</p>
+                                <p className="text-xs text-gray-500 mt-1">{notif.message}</p>
+                                <p className="text-xs text-gray-400 mt-2">
+                                  {format(new Date(notif.created_at), 'dd/MM/yyyy HH:mm')}
+                                </p>
+                              </div>
+                            ))
+                          )}
+                        </div>
+                      </div>
+                    </>
+                  )}
+                </div>
+                {/* Bouton Faire un don */}
                 <button
-                  onClick={() => setShowNotifications(!showNotifications)}
-                  className="relative p-2 hover:bg-gray-100 rounded-lg transition"
-                  aria-label="Notifications"
+                  onClick={() => setShowGiveModal(true)}
+                  className="flex items-center gap-2 bg-purple-600 text-white px-5 py-2 rounded-xl hover:bg-purple-700 transition text-sm"
                   type="button"
                 >
-                  <Bell size={20} />
-                  {notifications.filter(n => !n.read).length > 0 && (
-                    <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
-                  )}
+                  <Gift size={16} />
+                  <span className="hidden sm:inline">Faire un don</span>
+                  <span className="sm:hidden">Don</span>
                 </button>
-                {showNotifications && (
-                  <>
-                    <div
-                      className="fixed inset-0 bg-black/50 z-40 md:hidden"
-                      onClick={() => setShowNotifications(false)}
-                    />
-                    <div className={`
-                      fixed md:absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2
-                      md:top-auto md:left-auto md:right-0 md:mt-2 md:-translate-x-0 md:translate-y-0
-                      z-50 w-[calc(100%-2rem)] max-w-md md:w-80
-                      bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden
-                    `}>
-                      <div className="p-3 md:p-4 border-b border-gray-200 flex justify-between items-center">
-                        <h3 className="font-semibold">Notifications</h3>
-                        <button
-                          onClick={() => setShowNotifications(false)}
-                          className="p-1 hover:bg-gray-100 rounded-lg md:hidden"
-                          aria-label="Fermer"
-                        >
-                          <X size={20} />
-                        </button>
-                      </div>
-                      <div className="max-h-96 overflow-y-auto">
-                        {notifications.length === 0 ? (
-                          <div className="p-4 text-center text-gray-500">Aucune notification</div>
-                        ) : (
-                          notifications.map(notif => (
-                            <div
-                              key={notif.id}
-                              onClick={() => {
-                                markNotificationAsRead(notif.id);
-                                setShowNotifications(false);
-                              }}
-                              className={`p-3 md:p-4 border-b border-gray-100 cursor-pointer hover:bg-gray-50 transition ${
-                                !notif.read ? 'bg-purple-50' : ''
-                              }`}
-                            >
-                              <p className="font-medium text-sm">{notif.title}</p>
-                              <p className="text-xs text-gray-500 mt-1">{notif.message}</p>
-                              <p className="text-xs text-gray-400 mt-2">
-                                {format(new Date(notif.created_at), 'dd/MM/yyyy HH:mm')}
-                              </p>
-                            </div>
-                          ))
-                        )}
-                      </div>
-                    </div>
-                  </>
-                )}
               </div>
+            </div>
 
-              {/* Bouton Faire un don */}
-              <button
-                onClick={() => setShowGiveModal(true)}
-                className="flex items-center gap-1 md:gap-2 bg-purple-600 text-white px-3 py-1.5 md:px-5 md:py-2 rounded-xl hover:bg-purple-700 transition-all text-sm md:text-base"
-                type="button"
-              >
-                <Gift size={16} className="md:w-5 md:h-5" />
-                <span className="font-medium hidden sm:inline">Faire un don</span>
-                <span className="font-medium sm:hidden">Don</span>
-              </button>
+            {/* Version mobile (< md) : titre, puis ligne avec message et icônes */}
+            <div className="md:hidden">
+              <div className="flex justify-between items-start">
+                <h1 className="text-xl font-bold text-gray-800">
+                  {activeTab === 'overview' && 'Tableau de bord'}
+                  {activeTab === 'donations' && 'Mes dons'}
+                  {activeTab === 'analytics' && 'Analytiques'}
+                  {activeTab === 'settings' && 'Paramètres'}
+                </h1>
+                <div className="flex items-center gap-2">
+                  {/* Notifications */}
+                  <div className="relative">
+                    <button
+                      onClick={() => setShowNotifications(!showNotifications)}
+                      className="relative p-1.5 hover:bg-gray-100 rounded-lg transition"
+                      aria-label="Notifications"
+                      type="button"
+                    >
+                      <Bell size={18} />
+                      {notifications.filter(n => !n.read).length > 0 && (
+                        <span className="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full"></span>
+                      )}
+                    </button>
+                    {showNotifications && (
+                      <>
+                        <div
+                          className="fixed inset-0 bg-black/50 z-40 md:hidden"
+                          onClick={() => setShowNotifications(false)}
+                        />
+                        <div className={`
+                          fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2
+                          z-50 w-[calc(100%-2rem)] max-w-md
+                          bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden
+                        `}>
+                          <div className="p-3 border-b border-gray-200 flex justify-between items-center">
+                            <h3 className="font-semibold">Notifications</h3>
+                            <button
+                              onClick={() => setShowNotifications(false)}
+                              className="p-1 hover:bg-gray-100 rounded-lg"
+                              aria-label="Fermer"
+                            >
+                              <X size={20} />
+                            </button>
+                          </div>
+                          <div className="max-h-96 overflow-y-auto">
+                            {notifications.length === 0 ? (
+                              <div className="p-4 text-center text-gray-500">Aucune notification</div>
+                            ) : (
+                              notifications.map(notif => (
+                                <div
+                                  key={notif.id}
+                                  onClick={() => {
+                                    markNotificationAsRead(notif.id);
+                                    setShowNotifications(false);
+                                  }}
+                                  className={`p-3 border-b border-gray-100 cursor-pointer hover:bg-gray-50 transition ${
+                                    !notif.read ? 'bg-purple-50' : ''
+                                  }`}
+                                >
+                                  <p className="font-medium text-sm">{notif.title}</p>
+                                  <p className="text-xs text-gray-500 mt-1">{notif.message}</p>
+                                  <p className="text-xs text-gray-400 mt-2">
+                                    {format(new Date(notif.created_at), 'dd/MM/yyyy HH:mm')}
+                                  </p>
+                                </div>
+                              ))
+                            )}
+                          </div>
+                        </div>
+                      </>
+                    )}
+                  </div>
+                  {/* Bouton Don mobile */}
+                  <button
+                    onClick={() => setShowGiveModal(true)}
+                    className="flex items-center gap-1 bg-purple-600 text-white px-3 py-1.5 rounded-xl hover:bg-purple-700 transition text-xs"
+                    type="button"
+                  >
+                    <Gift size={14} />
+                    Don
+                  </button>
+                </div>
+              </div>
+              <p className="text-xs text-gray-600 mt-1">
+                Bienvenue, {partner.name} ! Soyez béni(e)
+              </p>
             </div>
           </div>
         </div>
 
         {/* Contenu scrollable avec padding supplémentaire sur mobile */}
         <div className="flex-1 overflow-y-auto p-4 sm:p-6 md:p-8 pt-8 sm:pt-6">
-          {/* Message de bienvenue mobile (sous le titre, dans le contenu) */}
-          <div className="sm:hidden mb-4">
-            <p className="text-sm text-gray-600">
-              Bienvenue, {partner.name} ! Soyez béni(e)
-            </p>
-          </div>
-
           {updateMessage && (
             <div className={`mb-4 md:mb-6 p-3 md:p-4 rounded-xl whitespace-pre-line text-sm md:text-base ${
               updateMessage.type === 'success' ? 'bg-green-50 text-green-800' : 'bg-red-50 text-red-800'
