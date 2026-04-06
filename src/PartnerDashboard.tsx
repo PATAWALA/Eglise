@@ -589,9 +589,9 @@ const PartnerDashboard = () => {
               {activeTab === 'settings' && 'Paramètres'}
             </h1>
             <div className="flex items-center gap-2 md:gap-4">
-              {/* Message de bienvenue (visible uniquement sur desktop pour ne pas casser la hauteur mobile) */}
-              <p className="text-xs text-gray-500 hidden sm:block">
-                Bienvenue, {partner.name}
+              {/* Message de bienvenue complet (visible sur desktop seulement) */}
+              <p className="text-sm text-gray-600 hidden sm:block">
+                Bienvenue, {partner.name} ! Soyez béni(e)
               </p>
 
               {/* Notifications */}
@@ -674,6 +674,13 @@ const PartnerDashboard = () => {
 
         {/* Contenu scrollable avec padding supplémentaire sur mobile */}
         <div className="flex-1 overflow-y-auto p-4 sm:p-6 md:p-8 pt-8 sm:pt-6">
+          {/* Message de bienvenue mobile (sous le titre, dans le contenu) */}
+          <div className="sm:hidden mb-4">
+            <p className="text-sm text-gray-600">
+              Bienvenue, {partner.name} ! Soyez béni(e)
+            </p>
+          </div>
+
           {updateMessage && (
             <div className={`mb-4 md:mb-6 p-3 md:p-4 rounded-xl whitespace-pre-line text-sm md:text-base ${
               updateMessage.type === 'success' ? 'bg-green-50 text-green-800' : 'bg-red-50 text-red-800'
