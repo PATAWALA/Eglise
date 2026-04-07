@@ -8,8 +8,6 @@ import {
   LogOut,
   Menu,
   X,
-  CheckCircle,
-  XCircle,
   Trash2,
   Filter,
   ChevronDown,
@@ -25,7 +23,8 @@ import {
   Power,
   AlertTriangle,
   StopCircle,
-  Lock
+  Lock,
+  UserPlus
 } from 'lucide-react';
 import { supabase } from './lib/supabase';
 import {
