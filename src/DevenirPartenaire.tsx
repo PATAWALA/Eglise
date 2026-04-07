@@ -219,7 +219,7 @@ const DevenirPartenaire = () => {
             }`}
           >
             <User className="inline w-4 h-4 mr-1.5" />
-            Inscription
+            Je m'inscris
           </button>
           <button
             onClick={() => { setMode('login'); setError(''); setSuccess(false); }}
@@ -230,7 +230,7 @@ const DevenirPartenaire = () => {
             }`}
           >
             <Lock className="inline w-4 h-4 mr-1.5" />
-            Connexion
+            Me connecter
           </button>
         </div>
 
