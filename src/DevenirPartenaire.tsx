@@ -44,7 +44,7 @@ const DevenirPartenaire = () => {
     setSuccess(false);
 
     const age = parseInt(registerData.age);
-    if (age < 18) {
+    if (isNaN(age) || age < 18) {
       setError('Vous devez avoir au moins 18 ans pour devenir partenaire.');
       setLoading(false);
       return;
@@ -57,6 +57,7 @@ const DevenirPartenaire = () => {
     }
 
     try {
+      // 1. Créer l'utilisateur dans Auth
       const { data: authData, error: authError } = await supabase.auth.signUp({
         email: registerData.email,
         password: registerData.password,
@@ -79,6 +80,7 @@ const DevenirPartenaire = () => {
       }
 
       if (authData.user) {
+        // 2. Insérer dans la table partners avec status 'approved' directement
         const { error: partnerError } = await supabase
           .from('partners')
           .insert({
@@ -87,27 +89,33 @@ const DevenirPartenaire = () => {
             name: registerData.name,
             phone: registerData.phone,
             age: age,
-            status: 'pending'
+            status: 'approved'
           });
 
         if (partnerError) {
-          console.error('Erreur:', partnerError);
+          console.error('Erreur insertion partenaire:', partnerError);
           setError('Erreur lors de l\'enregistrement');
           setLoading(false);
           return;
         }
 
-        await supabase.from('partnership_requests').insert({
-          name: registerData.name,
+        // 3. Connecter automatiquement l'utilisateur
+        const { error: signInError } = await supabase.auth.signInWithPassword({
           email: registerData.email,
-          phone: registerData.phone,
-          age: age,
-          message: registerData.message
+          password: registerData.password
         });
 
-        setSuccess(true);
-        setRegisterData({ email: '', password: '', name: '', phone: '', age: '', message: '' });
-        setTimeout(() => setSuccess(false), 5000);
+        if (signInError) {
+          setSuccess(true);
+          setRegisterData({ email: '', password: '', name: '', phone: '', age: '', message: '' });
+          setTimeout(() => {
+            setSuccess(false);
+            navigate('/devenir-partenaire');
+          }, 3000);
+        } else {
+          sessionStorage.setItem('partner_authenticated', 'true');
+          navigate('/espace-partenaire');
+        }
       }
     } catch (err: any) {
       console.error('Erreur:', err);
@@ -208,7 +216,7 @@ const DevenirPartenaire = () => {
           </div>
         </motion.div>
 
-        {/* Onglets séparés (hors formulaire) - boutons plus hauts */}
+        {/* Onglets */}
         <div className="flex justify-center gap-2 sm:gap-3 mb-4 sm:mb-5">
           <button
             onClick={() => { setMode('register'); setError(''); setSuccess(false); }}
@@ -219,7 +227,7 @@ const DevenirPartenaire = () => {
             }`}
           >
             <User className="inline w-4 h-4 mr-1.5" />
-            Je m'inscris
+            Je m'inscrit
           </button>
           <button
             onClick={() => { setMode('login'); setError(''); setSuccess(false); }}
@@ -234,7 +242,7 @@ const DevenirPartenaire = () => {
           </button>
         </div>
 
-        {/* Formulaire avec ombre renforcée */}
+        {/* Formulaire */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -357,7 +365,7 @@ const DevenirPartenaire = () => {
                   {success && (
                     <div className="bg-green-50 border border-green-200 rounded-lg p-2">
                       <p className="text-xs text-green-600">
-                        ✅ Demande envoyée ! Un responsable examinera votre candidature.
+                        ✅ Inscription réussie ! Redirection en cours...
                       </p>
                     </div>
                   )}
@@ -372,7 +380,7 @@ const DevenirPartenaire = () => {
                     ) : (
                       <>
                         <Heart size={18} />
-                        Envoyer ma demande
+                        Devenir partenaire
                       </>
                     )}
                   </button>
@@ -449,7 +457,7 @@ const DevenirPartenaire = () => {
           </div>
         </motion.div>
 
-        {/* Bouton Retour à l'accueil en bas - également plus haut */}
+        {/* Bouton Retour */}
         <div className="mt-6 flex justify-center">
           <button
             onClick={() => navigate('/')}

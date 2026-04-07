@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import { 
   LayoutDashboard, 
   Users, 
-  UserPlus, 
   TrendingUp, 
   DollarSign, 
   LogOut,
@@ -69,17 +68,6 @@ interface Partner {
   created_at: string;
 }
 
-interface PartnershipRequest {
-  id: number;
-  name: string;
-  email: string;
-  phone: string;
-  age: number;
-  message: string;
-  status: string;
-  created_at: string;
-}
-
 interface Admin {
   id: string;
   email: string;
@@ -96,7 +84,6 @@ const COLORS = ['#8b5cf6', '#ec489a', '#10b981', '#f59e0b', '#3b82f6', '#ef4444'
 
 const menuItems = [
   { id: 'dashboard', icon: LayoutDashboard, label: 'Tableau de bord', color: '#8b5cf6', bgColor: '#ede9fe' },
-  { id: 'requests', icon: UserPlus, label: 'Demandes', color: '#f97316', bgColor: '#fff7ed' },
   { id: 'partners', icon: Users, label: 'Partenaires', color: '#10b981', bgColor: '#ecfdf5' },
   { id: 'admins', icon: TrendingUp, label: 'Administrateurs', color: '#3b82f6', bgColor: '#eff6ff' },
   { id: 'settings', icon: Settings, label: 'Paramètres', color: '#6b7280', bgColor: '#f3f4f6' }
@@ -106,11 +93,10 @@ const AdminDashboard = () => {
   // ========== ETATS GENERAUX ==========
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
-  const [activePage, setActivePage] = useState<'dashboard' | 'partners' | 'requests' | 'admins' | 'settings'>('dashboard');
+  const [activePage, setActivePage] = useState<'dashboard' | 'partners' | 'admins' | 'settings'>('dashboard');
   const [loading, setLoading] = useState(true);
   const [donations, setDonations] = useState<Donation[]>([]);
   const [partners, setPartners] = useState<Partner[]>([]);
-  const [requests, setRequests] = useState<PartnershipRequest[]>([]);
   const [admins, setAdmins] = useState<Admin[]>([]);
   const [siteSettings, setSiteSettings] = useState<SiteSettings | null>(null);
   const [currentAdminId, setCurrentAdminId] = useState<string | null>(null);
@@ -179,7 +165,7 @@ const AdminDashboard = () => {
 
   const loadAllData = async () => {
     setLoading(true);
-    await Promise.all([loadDonations(), loadPartners(), loadRequests(), loadAdmins()]);
+    await Promise.all([loadDonations(), loadPartners(), loadAdmins()]);
     setLoading(false);
   };
 
@@ -193,12 +179,6 @@ const AdminDashboard = () => {
     const { data, error } = await supabase.from('partners').select('*').order('created_at', { ascending: false });
     if (error) console.error('Erreur chargement partenaires:', error);
     else setPartners(data || []);
-  };
-
-  const loadRequests = async () => {
-    const { data, error } = await supabase.from('partnership_requests').select('*').eq('status', 'pending').order('created_at', { ascending: false });
-    if (error) console.error('Erreur chargement demandes:', error);
-    else setRequests(data || []);
   };
 
   const loadAdmins = async () => {
@@ -235,29 +215,6 @@ const AdminDashboard = () => {
     const { error } = await supabase.from('partners').delete().eq('id', partner.id);
     if (error) alert('Erreur lors de la suppression');
     else await loadPartners();
-  };
-
-  // ========== FONCTIONS DEMANDES ==========
-  const approvePartner = async (request: PartnershipRequest) => {
-    try {
-      const adminId = sessionStorage.getItem('admin_id');
-      await supabase.from('partners').delete().eq('email', request.email);
-      await supabase.from('partners').insert({
-        id: crypto.randomUUID(), email: request.email, name: request.name,
-        phone: request.phone, age: request.age, status: 'approved',
-        reviewed_by: adminId, reviewed_at: new Date().toISOString()
-      });
-      await supabase.from('partnership_requests').update({ status: 'approved' }).eq('id', request.id);
-      await loadAllData();
-      alert(`${request.name} a été approuvé avec succès !`);
-    } catch (error) { alert('Erreur lors de l\'approbation'); }
-  };
-
-  const rejectRequest = async (request: PartnershipRequest) => {
-    if (!confirm(`Rejeter la demande de ${request.name} ?`)) return;
-    await supabase.from('partnership_requests').update({ status: 'rejected' }).eq('id', request.id);
-    await loadRequests();
-    alert(`Demande de ${request.name} rejetée.`);
   };
 
   // ========== FONCTIONS ADMINISTRATEURS ==========
@@ -455,7 +412,6 @@ const AdminDashboard = () => {
 
   const uniqueTypes = [...new Set(donations.map(d => d.donation_type))];
   const uniquePayments = [...new Set(donations.map(d => d.payment_method))];
-  const pendingRequests = requests.length;
   const approvedPartners = partners.filter(p => p.status === 'approved').length;
   const rejectedPartners = partners.filter(p => p.status === 'rejected').length;
   const pendingPartners = partners.filter(p => p.status === 'pending').length;
@@ -494,7 +450,6 @@ const AdminDashboard = () => {
         <nav className="p-3 space-y-1 overflow-y-auto h-[calc(100vh-5rem)]">
           {menuItems.map((item) => {
             let badgeCount = 0;
-            if (item.id === 'requests') badgeCount = pendingRequests;
             if (item.id === 'partners') badgeCount = partners.length;
             if (item.id === 'admins') badgeCount = admins.length;
             if (item.id === 'settings' && siteSettings?.maintenance_mode) badgeCount = 1;
@@ -561,7 +516,6 @@ const AdminDashboard = () => {
         <nav className="p-3 space-y-1 overflow-y-auto h-[calc(100vh-5rem)]">
           {menuItems.map((item) => {
             let badgeCount = 0;
-            if (item.id === 'requests') badgeCount = pendingRequests;
             if (item.id === 'partners') badgeCount = partners.length;
             if (item.id === 'admins') badgeCount = admins.length;
             if (item.id === 'settings' && siteSettings?.maintenance_mode) badgeCount = 1;
@@ -623,7 +577,6 @@ const AdminDashboard = () => {
             <div>
               <h2 className="text-xl sm:text-2xl font-bold text-gray-800">
                 {activePage === 'dashboard' && 'Tableau de bord'}
-                {activePage === 'requests' && 'Demandes de partenariat'}
                 {activePage === 'partners' && 'Partenaires'}
                 {activePage === 'admins' && 'Administrateurs'}
                 {activePage === 'settings' && 'Paramètres avancés'}
@@ -800,27 +753,6 @@ const AdminDashboard = () => {
                 )}
               </div>
             </>
-          )}
-
-          {/* ========== PAGE DEMANDES ========== */}
-          {activePage === 'requests' && (
-            <div className="space-y-4">
-              {requests.length === 0 ? (
-                <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8 sm:p-12 text-center"><CheckCircle size={40} className="mx-auto text-green-300 mb-3" /><p className="text-gray-500">Aucune demande en attente</p></div>
-              ) : (
-                requests.map((req) => (
-                  <div key={req.id} className="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 sm:p-6 hover:shadow-md transition">
-                    <div className="flex flex-col sm:flex-row justify-between gap-4">
-                      <div><h3 className="text-lg font-semibold text-gray-800">{req.name}</h3><div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-2 text-sm text-gray-500"><p>{req.email}</p><p>{req.phone}</p><p>{req.age} ans</p><p>{new Date(req.created_at).toLocaleDateString()}</p></div>{req.message && <p className="mt-3 p-3 bg-gray-50 rounded-lg text-gray-600 text-sm">{req.message}</p>}</div>
-                      <div className="flex gap-2 flex-wrap">
-                        <button type="button" onClick={() => approvePartner(req)} className="flex items-center gap-2 bg-green-600 text-white px-4 py-2 rounded-xl hover:bg-green-700 transition shadow-sm text-sm"><CheckCircle size={16} /> Approuver</button>
-                        <button type="button" onClick={() => rejectRequest(req)} className="flex items-center gap-2 bg-red-600 text-white px-4 py-2 rounded-xl hover:bg-red-700 transition shadow-sm text-sm"><XCircle size={16} /> Rejeter</button>
-                      </div>
-                    </div>
-                  </div>
-                ))
-              )}
-            </div>
           )}
 
           {/* ========== PAGE PARTENAIRES ========== */}
